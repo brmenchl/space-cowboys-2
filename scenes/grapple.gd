@@ -138,6 +138,11 @@ func _check_rope_intersection() -> void:
 	query.exclude = [_shooter.get_rid()]
 	if attach_body and is_instance_valid(attach_body):
 		query.exclude.append(attach_body.get_rid())
+	# hook_area's overlap detection lags a physics frame behind _tip_local, so
+	# whatever it's currently touching counts as "the tip" even before the
+	# body_entered signal (and attach_body) catches up.
+	for body in hook_area.get_overlapping_bodies():
+		query.exclude.append(body.get_rid())
 
 	if space_state.intersect_ray(query):
 		reset()
