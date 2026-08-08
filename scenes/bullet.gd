@@ -1,11 +1,9 @@
 extends Node2D
 class_name Bullet
 
-const CIRCLE_SEGMENTS := 16
-
 @export var config: BulletConfig = preload("res://resources/bullet_config.tres")
+@export var visual_scene: PackedScene = preload("res://scenes/visuals/bullet_visual.tscn")
 
-@onready var polygon: Polygon2D = $Polygon2D
 @onready var area: Area2D = $Area2D
 @onready var collision_shape: CollisionShape2D = $Area2D/CollisionShape2D
 
@@ -16,8 +14,9 @@ var _time_alive: float = 0.0
 
 
 func _ready() -> void:
-	polygon.polygon = _build_circle_points(config.radius)
-	polygon.color = config.color
+	var visual := visual_scene.instantiate()
+	visual.modulate = config.color
+	add_child(visual)
 
 	var shape := CircleShape2D.new()
 	shape.radius = config.radius
@@ -37,11 +36,3 @@ func _on_body_entered(body: Node2D) -> void:
 	if body is Player and body != shooter:
 		body.take_damage(config.damage)
 		queue_free()
-
-
-func _build_circle_points(radius: float) -> PackedVector2Array:
-	var points := PackedVector2Array()
-	for i in range(CIRCLE_SEGMENTS):
-		var angle := TAU * i / CIRCLE_SEGMENTS
-		points.append(Vector2(cos(angle), sin(angle)) * radius)
-	return points

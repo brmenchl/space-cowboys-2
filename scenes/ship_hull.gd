@@ -4,14 +4,14 @@ class_name ShipHull
 const HULL_COLOR := Color(0.5, 0.5, 0.5)
 
 @export var movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
-
-@onready var polygon: Polygon2D = $Polygon2D
+@export var visual_scene: PackedScene = preload("res://scenes/visuals/ship_visual.tscn")
 
 var angular_velocity: float = 0.0
 
 
 func _ready() -> void:
-	polygon.color = HULL_COLOR
+	modulate = HULL_COLOR
+	add_child(visual_scene.instantiate())
 
 
 func _physics_process(delta: float) -> void:

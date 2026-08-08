@@ -40,9 +40,6 @@ text = "Player 1"
 layout_mode = 2
 custom_minimum_size = Vector2(80, 60)
 
-[node name="Triangle" type="Polygon2D" parent="Margin/VBox/Portrait"]
-polygon = PackedVector2Array(24, 0, -16, 10, -16, -10)
-
 [node name="HealthBar" type="ProgressBar" parent="Margin/VBox"]
 layout_mode = 2
 custom_minimum_size = Vector2(140, 16)

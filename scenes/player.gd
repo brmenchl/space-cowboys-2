@@ -4,35 +4,37 @@ class_name Player
 const BulletScene := preload("res://scenes/bullet.tscn")
 const ShipHullScene := preload("res://scenes/ship_hull.tscn")
 
-# Distance from the ship's center to its front tip, matching the Polygon2D/
-# CollisionPolygon2D shape below; bullets spawn this far out plus the
-# configurable muzzle_offset.
+# Distance from the ship's center to its front tip; bullets spawn this far
+# out plus the configurable muzzle_offset. Independent of whatever visual
+# asset is currently assigned to ship_visual_scene.
 const TIP_LENGTH := 24.0
 
-# Size and corner rounding of the pilot's polygon, used once ejected in
-# place of the ship's Polygon2D/CollisionPolygon2D shape.
-const PILOT_SIZE := Vector2(14.0, 10.0)
-const PILOT_CORNER_RADIUS := 3.0
-const PILOT_CORNER_SEGMENTS := 4
-
 signal health_changed(new_health: int)
+signal visual_changed(visual_scene: PackedScene)
 
 const MAX_HEALTH := 100
 
 @export var color: Color = Color.WHITE
 @export var input_prefix: String = "p1"
 @export var movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
+@export var ship_visual_scene: PackedScene = preload("res://scenes/visuals/ship_visual.tscn")
+@export var pilot_visual_scene: PackedScene = preload("res://scenes/visuals/pilot_visual.tscn")
 
-@onready var polygon: Polygon2D = $Polygon2D
-@onready var collision_polygon: CollisionPolygon2D = $CollisionPolygon2D
+@onready var ship_collision: CollisionPolygon2D = $ShipCollision
+@onready var pilot_collision: CollisionPolygon2D = $PilotCollision
 
 var angular_velocity: float = 0.0
 var health: int = MAX_HEALTH
 var is_ejected: bool = false
+var active_visual_scene: PackedScene
+
+var _visual: Node2D
 
 
 func _ready() -> void:
-	polygon.color = color
+	modulate = color
+	pilot_collision.disabled = true
+	_set_visual(ship_visual_scene)
 
 
 func _physics_process(delta: float) -> void:
@@ -102,26 +104,15 @@ func _eject() -> void:
 	velocity = Vector2.ZERO
 	angular_velocity = 0.0
 
-	var pilot_points := _build_rounded_rect_points(PILOT_SIZE, PILOT_CORNER_RADIUS, PILOT_CORNER_SEGMENTS)
-	polygon.polygon = pilot_points
-	collision_polygon.polygon = pilot_points
+	ship_collision.disabled = true
+	pilot_collision.disabled = false
+	_set_visual(pilot_visual_scene)
 
 
-func _build_rounded_rect_points(size: Vector2, corner_radius: float, corner_segments: int) -> PackedVector2Array:
-	var half := size / 2.0
-	var corner_centers := [
-		Vector2(half.x - corner_radius, -half.y + corner_radius),
-		Vector2(half.x - corner_radius, half.y - corner_radius),
-		Vector2(-half.x + corner_radius, half.y - corner_radius),
-		Vector2(-half.x + corner_radius, -half.y + corner_radius),
-	]
-	var start_angles := [-PI / 2.0, 0.0, PI / 2.0, PI]
-
-	var points := PackedVector2Array()
-	for i in range(corner_centers.size()):
-		var center: Vector2 = corner_centers[i]
-		var start_angle: float = start_angles[i]
-		for j in range(corner_segments + 1):
-			var angle: float = start_angle + (PI / 2.0) * (j / float(corner_segments))
-			points.append(center + Vector2(cos(angle), sin(angle)) * corner_radius)
-	return points
+func _set_visual(visual_scene: PackedScene) -> void:
+	if _visual:
+		_visual.queue_free()
+	_visual = visual_scene.instantiate()
+	add_child(_visual)
+	active_visual_scene = visual_scene
+	visual_changed.emit(visual_scene)
