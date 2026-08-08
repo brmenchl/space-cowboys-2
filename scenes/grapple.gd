@@ -101,6 +101,9 @@ func _physics_process(delta: float) -> void:
 		_update_links()
 		queue_redraw()
 
+	if state == State.EXTENDING or state == State.ATTACHED:
+		_check_rope_intersection()
+
 
 func _process_extending(delta: float) -> void:
 	_time_alive += delta
@@ -118,6 +121,26 @@ func _process_retracting(delta: float) -> void:
 		visible = false
 		_clear_links()
 		queue_redraw()
+
+
+# The hook tip is allowed to touch its target (that's how it attaches), but
+# anything else crossing the rope's own length between the shooter and the
+# tip snags the line, so we cast just short of the tip to catch that without
+# re-triggering on the object the hook is already latched onto.
+func _check_rope_intersection() -> void:
+	var trimmed_length := _current_length - config.hook_radius
+	if trimmed_length <= 0.0:
+		return
+
+	var local_dir := _tip_local.normalized() if _tip_local.length() > 0.0 else Vector2.RIGHT
+	var space_state := get_world_2d().direct_space_state
+	var query := PhysicsRayQueryParameters2D.create(global_position, to_global(local_dir * trimmed_length))
+	query.exclude = [_shooter.get_rid()]
+	if attach_body and is_instance_valid(attach_body):
+		query.exclude.append(attach_body.get_rid())
+
+	if space_state.intersect_ray(query):
+		reset()
 
 
 func _on_hook_body_entered(body: Node2D) -> void:
