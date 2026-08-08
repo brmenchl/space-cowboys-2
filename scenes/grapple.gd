@@ -104,6 +104,9 @@ func _physics_process(delta: float) -> void:
 	if state == State.EXTENDING or state == State.ATTACHED:
 		_check_rope_intersection()
 
+	if state != State.IDLE and _is_tip_off_map():
+		reset()
+
 
 func _process_extending(delta: float) -> void:
 	_time_alive += delta
@@ -111,6 +114,12 @@ func _process_extending(delta: float) -> void:
 	_tip_local = Vector2.RIGHT * _current_length
 	if _time_alive >= config.time_to_live:
 		_start_retracting()
+
+
+func _is_tip_off_map() -> bool:
+	var map_size := get_viewport().get_visible_rect().size
+	var tip_global := to_global(_tip_local)
+	return tip_global.x < 0.0 or tip_global.x > map_size.x or tip_global.y < 0.0 or tip_global.y > map_size.y
 
 
 func _process_retracting(delta: float) -> void:
