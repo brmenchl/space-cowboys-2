@@ -25,6 +25,7 @@ func setup(player: Player, title: String) -> void:
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(_player):
+		_portrait.polygon = _player.polygon.polygon
 		_portrait.rotation = _player.rotation
 
 
