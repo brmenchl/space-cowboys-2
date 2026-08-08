@@ -94,6 +94,7 @@ func _physics_process(delta: float) -> void:
 				attach_point = attach_body.global_position
 			_rope_length = maxf(_rope_length - config.pull_speed * delta, 0.0)
 			_tip_local = to_local(attach_point)
+			_current_length = _tip_local.length()
 
 	if state != State.IDLE:
 		hook_area.position = _tip_local

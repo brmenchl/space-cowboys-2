@@ -21,7 +21,7 @@ signal visual_changed(visual_scene: PackedScene)
 @export var pilot_recoil_force: float = 250.0
 @export var grapple_config: GrappleConfig = preload("res://resources/grapple_config.tres")
 @export var eject_force: float = 120.0
-@export var eject_separation: float = 40.0
+@export var eject_distance: float = 40.0
 
 @onready var ship_collision: CollisionPolygon2D = $ShipCollision
 @onready var pilot_collision: CollisionPolygon2D = $PilotCollision
@@ -207,7 +207,7 @@ func _become_pilot() -> void:
 	is_ejected = true
 	var eject_direction := Vector2.RIGHT.rotated(randf_range(0.0, TAU))
 	velocity = eject_direction * eject_force
-	global_position += eject_direction * eject_separation
+	global_position += eject_direction * eject_distance
 	angular_velocity = 0.0
 
 	ship_collision.disabled = true
