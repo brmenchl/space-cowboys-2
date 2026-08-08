@@ -1,6 +1,13 @@
 extends CharacterBody2D
 class_name Player
 
+const BulletScene := preload("res://scenes/bullet.tscn")
+
+# Distance from the ship's center to its front tip, matching the Polygon2D/
+# CollisionPolygon2D shape below; bullets spawn this far out plus the
+# configurable muzzle_offset.
+const TIP_LENGTH := 24.0
+
 @export var color: Color = Color.WHITE
 @export var input_prefix: String = "p1"
 @export var movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
@@ -18,6 +25,7 @@ func _physics_process(delta: float) -> void:
 	_process_turning(delta)
 	_process_thrust(delta)
 	move_and_slide()
+	_process_shooting()
 
 
 func _process_turning(delta: float) -> void:
@@ -37,3 +45,17 @@ func _process_thrust(delta: float) -> void:
 	velocity -= facing * brake_input * movement_config.deceleration * delta
 	velocity -= velocity * movement_config.linear_friction * delta
 	velocity = velocity.limit_length(movement_config.max_speed)
+
+
+func _process_shooting() -> void:
+	if Input.is_action_just_pressed(input_prefix + "_action1"):
+		_shoot()
+
+
+func _shoot() -> void:
+	var bullet: Bullet = BulletScene.instantiate()
+	get_tree().current_scene.add_child(bullet)
+
+	var facing := Vector2.RIGHT.rotated(rotation)
+	bullet.global_position = global_position + facing * (TIP_LENGTH + bullet.config.muzzle_offset)
+	bullet.velocity = facing * bullet.config.speed
