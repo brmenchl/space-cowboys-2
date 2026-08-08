@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scenes/player_hud_card.gd" id="1"]
 
@@ -11,6 +11,13 @@ corner_radius_bottom_left = 4
 
 [sub_resource type="StyleBoxFlat" id="2"]
 bg_color = Color(0.1, 0.1, 0.1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="3"]
+bg_color = Color(0.3, 0.6, 0.9, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -40,7 +47,16 @@ text = "Player 1"
 layout_mode = 2
 custom_minimum_size = Vector2(80, 60)
 
-[node name="HealthBar" type="ProgressBar" parent="Margin/VBox"]
+[node name="ShipHealthBar" type="ProgressBar" parent="Margin/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 10)
+theme_override_styles/background = SubResource("2")
+theme_override_styles/fill = SubResource("3")
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="PilotHealthBar" type="ProgressBar" parent="Margin/VBox"]
 layout_mode = 2
 custom_minimum_size = Vector2(140, 16)
 theme_override_styles/background = SubResource("2")

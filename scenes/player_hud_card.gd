@@ -3,7 +3,8 @@ class_name PlayerHudCard
 
 @onready var _title_label: Label = $Margin/VBox/TitleLabel
 @onready var _portrait_container: Control = $Margin/VBox/Portrait
-@onready var _health_bar: ProgressBar = $Margin/VBox/HealthBar
+@onready var _ship_health_bar: ProgressBar = $Margin/VBox/ShipHealthBar
+@onready var _pilot_health_bar: ProgressBar = $Margin/VBox/PilotHealthBar
 
 var _player: Player
 var _portrait_visual: Node2D
@@ -16,9 +17,15 @@ func _ready() -> void:
 func setup(player: Player, title: String) -> void:
 	_player = player
 	_title_label.text = title
-	_health_bar.max_value = Player.MAX_HEALTH
-	_health_bar.value = player.health
-	player.health_changed.connect(_on_health_changed)
+
+	_ship_health_bar.max_value = player.health_config.ship_max_health
+	_ship_health_bar.value = player.ship_health
+	_pilot_health_bar.max_value = player.health_config.pilot_max_health
+	_pilot_health_bar.value = player.pilot_health
+
+	player.ship_health_changed.connect(_on_ship_health_changed)
+	player.pilot_health_changed.connect(_on_pilot_health_changed)
+	player.ejected.connect(_on_ejected)
 	player.visual_changed.connect(_on_visual_changed)
 	_on_visual_changed(player.active_visual_scene)
 
@@ -42,5 +49,13 @@ func _center_portrait() -> void:
 		_portrait_visual.position = _portrait_container.size / 2
 
 
-func _on_health_changed(new_health: int) -> void:
-	_health_bar.value = new_health
+func _on_ship_health_changed(new_health: int) -> void:
+	_ship_health_bar.value = new_health
+
+
+func _on_pilot_health_changed(new_health: int) -> void:
+	_pilot_health_bar.value = new_health
+
+
+func _on_ejected() -> void:
+	_ship_health_bar.visible = false

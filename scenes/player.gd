@@ -9,14 +9,15 @@ const ShipHullScene := preload("res://scenes/ship_hull.tscn")
 # asset is currently assigned to ship_visual_scene.
 const TIP_LENGTH := 24.0
 
-signal health_changed(new_health: int)
+signal ship_health_changed(new_health: int)
+signal pilot_health_changed(new_health: int)
+signal ejected
 signal visual_changed(visual_scene: PackedScene)
-
-const MAX_HEALTH := 100
 
 @export var color: Color = Color.WHITE
 @export var input_prefix: String = "p1"
 @export var movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
+@export var health_config: HealthConfig = preload("res://resources/health_config.tres")
 @export var ship_visual_scene: PackedScene = preload("res://scenes/visuals/ship_visual.tscn")
 @export var pilot_visual_scene: PackedScene = preload("res://scenes/visuals/pilot_visual.tscn")
 
@@ -24,7 +25,8 @@ const MAX_HEALTH := 100
 @onready var pilot_collision: CollisionPolygon2D = $PilotCollision
 
 var angular_velocity: float = 0.0
-var health: int = MAX_HEALTH
+var ship_health: int
+var pilot_health: int
 var is_ejected: bool = false
 var active_visual_scene: PackedScene
 
@@ -32,6 +34,8 @@ var _visual: Node2D
 
 
 func _ready() -> void:
+	ship_health = health_config.ship_max_health
+	pilot_health = health_config.pilot_max_health
 	modulate = color
 	pilot_collision.disabled = true
 	_set_visual(ship_visual_scene)
@@ -81,8 +85,14 @@ func _shoot() -> void:
 
 
 func take_damage(amount: int) -> void:
-	health = maxi(health - amount, 0)
-	health_changed.emit(health)
+	if is_ejected:
+		pilot_health = maxi(pilot_health - amount, 0)
+		pilot_health_changed.emit(pilot_health)
+	else:
+		ship_health = maxi(ship_health - amount, 0)
+		ship_health_changed.emit(ship_health)
+		if ship_health == 0:
+			_eject_destroyed()
 
 
 func _process_ejecting() -> void:
@@ -91,8 +101,27 @@ func _process_ejecting() -> void:
 
 
 func _eject() -> void:
-	is_ejected = true
+	_spawn_drifting_hull()
+	_become_pilot()
 
+
+func _eject_destroyed() -> void:
+	_become_pilot()
+
+
+func _become_pilot() -> void:
+	is_ejected = true
+	velocity = Vector2.ZERO
+	angular_velocity = 0.0
+
+	ship_collision.disabled = true
+	pilot_collision.disabled = false
+	_set_visual(pilot_visual_scene)
+
+	ejected.emit()
+
+
+func _spawn_drifting_hull() -> void:
 	var hull: ShipHull = ShipHullScene.instantiate()
 	get_tree().current_scene.add_child(hull)
 	hull.global_position = global_position
@@ -100,13 +129,6 @@ func _eject() -> void:
 	hull.velocity = velocity
 	hull.angular_velocity = angular_velocity
 	hull.movement_config = movement_config
-
-	velocity = Vector2.ZERO
-	angular_velocity = 0.0
-
-	ship_collision.disabled = true
-	pilot_collision.disabled = false
-	_set_visual(pilot_visual_scene)
 
 
 func _set_visual(visual_scene: PackedScene) -> void:
