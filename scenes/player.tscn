@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/player.gd" id="1"]
+[ext_resource type="Script" path="res://components/wrap_2d.gd" id="2"]
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1")
@@ -10,3 +11,7 @@ polygon = PackedVector2Array(24, 0, -16, 10, -16, -10)
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(24, 0, -16, 10, -16, -10)
+
+[node name="Wrap2D" type="Node" parent="."]
+script = ExtResource("2")
+wrap_vertically = true
