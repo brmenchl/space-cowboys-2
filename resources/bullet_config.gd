@@ -9,3 +9,4 @@ class_name BulletConfig
 # Distance from the shooter's center to where the bullet spawns.
 @export var muzzle_distance: float = 36.0
 @export var damage: int = 5
+@export var fire_rate: float = 2.0

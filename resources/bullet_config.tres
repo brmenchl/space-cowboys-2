@@ -10,3 +10,4 @@ radius = 4.0
 color = Color(1, 0.9, 0.2, 1)
 muzzle_distance = 36.0
 damage = 5
+fire_rate = 2.0

@@ -18,9 +18,11 @@ signal visual_changed(visual_scene: PackedScene)
 @export var ship_bullet_config: BulletConfig = preload("res://resources/bullet_config.tres")
 @export var pilot_bullet_config: BulletConfig = preload("res://resources/pilot_bullet_config.tres")
 @export var pilot_recoil_force: float = 250.0
+@export var grapple_config: GrappleConfig = preload("res://resources/grapple_config.tres")
 
 @onready var ship_collision: CollisionPolygon2D = $ShipCollision
 @onready var pilot_collision: CollisionPolygon2D = $PilotCollision
+@onready var grapple: Grapple = $Grapple
 
 var angular_velocity: float = 0.0
 var ship_health: int
@@ -29,6 +31,7 @@ var is_ejected: bool = false
 var active_visual_scene: PackedScene
 
 var _visual: Node2D
+var _shoot_cooldown: float = 0.0
 
 
 func _ready() -> void:
@@ -36,6 +39,7 @@ func _ready() -> void:
 	pilot_health = health_config.pilot_max_health
 	modulate = color
 	pilot_collision.disabled = true
+	grapple.config = grapple_config
 	_set_visual(ship_visual_scene)
 
 
@@ -46,7 +50,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		_process_thrust(delta)
 	move_and_slide()
-	_process_shooting()
+	_process_shooting(delta)
+	_process_grapple()
 	_process_ejecting()
 
 
@@ -70,16 +75,33 @@ func _process_thrust(delta: float) -> void:
 
 
 func _process_pilot_drift(delta: float) -> void:
-	velocity -= velocity * movement_config.linear_friction * delta
+	if grapple.is_pulling():
+		velocity = global_position.direction_to(grapple.attach_point) * grapple_config.pull_speed
+		if global_position.distance_to(grapple.attach_point) <= grapple_config.arrival_distance:
+			grapple.release()
+	else:
+		velocity -= velocity * movement_config.linear_friction * delta
 
 
-func _process_shooting() -> void:
-	if Input.is_action_just_pressed(input_prefix + "_action1"):
-		_shoot()
+func _process_shooting(delta: float) -> void:
+	_shoot_cooldown = maxf(_shoot_cooldown - delta, 0.0)
+
+	if is_ejected and grapple.is_engaged():
+		return
+	if _shoot_cooldown > 0.0:
+		return
+	if Input.is_action_pressed(input_prefix + "_action1"):
+		var config: BulletConfig = pilot_bullet_config if is_ejected else ship_bullet_config
+		_shoot(config)
+		_shoot_cooldown = 1.0 / config.fire_rate
 
 
-func _shoot() -> void:
-	var config: BulletConfig = pilot_bullet_config if is_ejected else ship_bullet_config
+func _process_grapple() -> void:
+	if is_ejected and Input.is_action_just_pressed(input_prefix + "_action2"):
+		grapple.handle_action_pressed()
+
+
+func _shoot(config: BulletConfig) -> void:
 	var facing := Vector2.RIGHT.rotated(rotation)
 
 	var bullet: Bullet = BulletScene.instantiate()
