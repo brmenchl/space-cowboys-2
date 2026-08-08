@@ -9,3 +9,4 @@ time_to_live = 1.5
 radius = 4.0
 color = Color(1, 0.9, 0.2, 1)
 muzzle_offset = 12.0
+damage = 5

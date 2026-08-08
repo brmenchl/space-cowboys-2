@@ -64,3 +64,9 @@ func _shoot() -> void:
 	var facing := Vector2.RIGHT.rotated(rotation)
 	bullet.global_position = global_position + facing * (TIP_LENGTH + bullet.config.muzzle_offset)
 	bullet.velocity = facing * bullet.config.speed
+	bullet.shooter = self
+
+
+func take_damage(amount: int) -> void:
+	health = maxi(health - amount, 0)
+	health_changed.emit(health)
