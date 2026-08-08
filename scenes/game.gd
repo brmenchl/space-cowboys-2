@@ -8,15 +8,22 @@ const PlayerScene := preload("res://scenes/player.tscn")
 @onready var exit_button: Button = $PauseMenu/CenterContainer/VBoxContainer/ExitButton
 @onready var player1_card: PlayerHudCard = $Hud/Player1Card
 @onready var player2_card: PlayerHudCard = $Hud/Player2Card
+@onready var win_popup: CanvasLayer = $WinPopup
+@onready var win_label: Label = $WinPopup/CenterContainer/VBoxContainer/WinLabel
+@onready var win_exit_button: Button = $WinPopup/CenterContainer/VBoxContainer/ExitButton
 
 
 func _ready() -> void:
 	exit_button.pressed.connect(_on_exit_pressed)
+	win_exit_button.pressed.connect(_on_exit_pressed)
 	_spawn_players()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
+	if win_popup.visible:
+		if event.is_action_pressed("ui_accept"):
+			_on_exit_pressed()
+	elif event.is_action_pressed("ui_cancel"):
 		_toggle_pause()
 
 
@@ -45,6 +52,16 @@ func _spawn_players() -> void:
 
 	player1_card.setup(player1, "Player 1")
 	player2_card.setup(player2, "Player 2")
+
+	player1.health_changed.connect(_on_player_health_changed.bind("Player 2"))
+	player2.health_changed.connect(_on_player_health_changed.bind("Player 1"))
+
+
+func _on_player_health_changed(new_health: int, winner_name: String) -> void:
+	if new_health == 0:
+		win_label.text = winner_name.to_upper() + " WINS"
+		win_popup.visible = true
+		get_tree().paused = true
 
 
 func _random_spawn_position(screen_size: Vector2) -> Vector2:
