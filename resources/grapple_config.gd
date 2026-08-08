@@ -8,4 +8,5 @@ class_name GrappleConfig
 @export var arrival_distance: float = 20.0
 @export var hook_radius: float = 5.0
 @export var line_width: float = 3.0
+@export var link_spacing: float = 12.0
 @export var color: Color = Color(0.45, 0.29, 0.13)

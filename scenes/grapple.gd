@@ -4,6 +4,7 @@ class_name Grapple
 enum State { IDLE, EXTENDING, ATTACHED, RETRACTING }
 
 @export var config: GrappleConfig = preload("res://resources/grapple_config.tres")
+@export var link_visual_scene: PackedScene = preload("res://scenes/visuals/grapple_link_visual.tscn")
 
 @onready var hook_area: Area2D = $HookArea
 @onready var hook_collision: CollisionShape2D = $HookArea/CollisionShape2D
@@ -16,6 +17,7 @@ var _shooter: Node2D
 var _current_length: float = 0.0
 var _time_alive: float = 0.0
 var _tip_local: Vector2 = Vector2.ZERO
+var _links: Array[Node2D] = []
 
 
 func _ready() -> void:
@@ -56,6 +58,7 @@ func reset() -> void:
 	_tip_local = Vector2.ZERO
 	attach_body = null
 	visible = false
+	_clear_links()
 	queue_redraw()
 
 
@@ -66,6 +69,7 @@ func _start_extending() -> void:
 	_tip_local = Vector2.ZERO
 	attach_body = null
 	visible = true
+	_clear_links()
 
 
 func _start_retracting() -> void:
@@ -85,6 +89,7 @@ func _physics_process(delta: float) -> void:
 
 	if state != State.IDLE:
 		hook_area.position = _tip_local
+		_update_links()
 		queue_redraw()
 
 
@@ -102,6 +107,7 @@ func _process_retracting(delta: float) -> void:
 	if _current_length <= 0.0:
 		state = State.IDLE
 		visible = false
+		_clear_links()
 		queue_redraw()
 
 
@@ -122,8 +128,33 @@ func _is_valid_target(body: Node2D) -> bool:
 	return false
 
 
+# Links spawn and grow out from the pilot as the rope extends, one segment
+# per link_spacing of current length, rather than a single stretched line.
+func _update_links() -> void:
+	var link_count := int(_current_length / config.link_spacing)
+	while _links.size() < link_count:
+		var link: Node2D = link_visual_scene.instantiate()
+		link.modulate = config.color
+		add_child(link)
+		_links.append(link)
+	while _links.size() > link_count:
+		_links.pop_back().queue_free()
+
+	var direction := _tip_local.normalized() if _tip_local.length() > 0.0 else Vector2.RIGHT
+	for i in range(_links.size()):
+		var link: Node2D = _links[i]
+		link.position = direction * config.link_spacing * i
+		link.rotation = direction.angle()
+		link.scale = Vector2(config.link_spacing, config.line_width)
+
+
+func _clear_links() -> void:
+	for link in _links:
+		link.queue_free()
+	_links.clear()
+
+
 func _draw() -> void:
 	if state == State.IDLE:
 		return
-	draw_line(Vector2.ZERO, _tip_local, config.color, config.line_width)
 	draw_circle(_tip_local, config.hook_radius, config.color)
