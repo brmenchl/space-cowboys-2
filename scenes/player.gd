@@ -4,11 +4,6 @@ class_name Player
 const BulletScene := preload("res://scenes/bullet.tscn")
 const ShipHullScene := preload("res://scenes/ship_hull.tscn")
 
-# Distance from the ship's center to its front tip; bullets spawn this far
-# out plus the configurable muzzle_offset. Independent of whatever visual
-# asset is currently assigned to ship_visual_scene.
-const TIP_LENGTH := 24.0
-
 signal ship_health_changed(new_health: int)
 signal pilot_health_changed(new_health: int)
 signal ejected
@@ -20,6 +15,9 @@ signal visual_changed(visual_scene: PackedScene)
 @export var health_config: HealthConfig = preload("res://resources/health_config.tres")
 @export var ship_visual_scene: PackedScene = preload("res://scenes/visuals/ship_visual.tscn")
 @export var pilot_visual_scene: PackedScene = preload("res://scenes/visuals/pilot_visual.tscn")
+@export var ship_bullet_config: BulletConfig = preload("res://resources/bullet_config.tres")
+@export var pilot_bullet_config: BulletConfig = preload("res://resources/pilot_bullet_config.tres")
+@export var pilot_recoil_force: float = 250.0
 
 @onready var ship_collision: CollisionPolygon2D = $ShipCollision
 @onready var pilot_collision: CollisionPolygon2D = $PilotCollision
@@ -43,7 +41,9 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_process_turning(delta)
-	if not is_ejected:
+	if is_ejected:
+		_process_pilot_drift(delta)
+	else:
 		_process_thrust(delta)
 	move_and_slide()
 	_process_shooting()
@@ -69,19 +69,28 @@ func _process_thrust(delta: float) -> void:
 	velocity = velocity.limit_length(movement_config.max_speed)
 
 
+func _process_pilot_drift(delta: float) -> void:
+	velocity -= velocity * movement_config.linear_friction * delta
+
+
 func _process_shooting() -> void:
-	if not is_ejected and Input.is_action_just_pressed(input_prefix + "_action1"):
+	if Input.is_action_just_pressed(input_prefix + "_action1"):
 		_shoot()
 
 
 func _shoot() -> void:
-	var bullet: Bullet = BulletScene.instantiate()
-	get_tree().current_scene.add_child(bullet)
-
+	var config: BulletConfig = pilot_bullet_config if is_ejected else ship_bullet_config
 	var facing := Vector2.RIGHT.rotated(rotation)
-	bullet.global_position = global_position + facing * (TIP_LENGTH + bullet.config.muzzle_offset)
-	bullet.velocity = facing * bullet.config.speed
+
+	var bullet: Bullet = BulletScene.instantiate()
+	bullet.config = config
+	get_tree().current_scene.add_child(bullet)
+	bullet.global_position = global_position + facing * config.muzzle_distance
+	bullet.velocity = facing * config.speed
 	bullet.shooter = self
+
+	if is_ejected:
+		velocity -= facing * pilot_recoil_force
 
 
 func take_damage(amount: int) -> void:
