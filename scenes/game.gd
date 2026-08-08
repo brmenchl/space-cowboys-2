@@ -1,11 +1,16 @@
 extends Node2D
 
+const PlayerScene := preload("res://scenes/player.tscn")
+
+@export var config: GameConfig = preload("res://resources/game_config.tres")
+
 @onready var pause_menu: CanvasLayer = $PauseMenu
 @onready var exit_button: Button = $PauseMenu/CenterContainer/VBoxContainer/ExitButton
 
 
 func _ready() -> void:
 	exit_button.pressed.connect(_on_exit_pressed)
+	_spawn_players()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -21,3 +26,33 @@ func _toggle_pause() -> void:
 func _on_exit_pressed() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/title.tscn")
+
+
+func _spawn_players() -> void:
+	var screen_size: Vector2 = get_viewport().get_visible_rect().size
+	var player1_position: Vector2 = _random_spawn_position(screen_size)
+	var player2_position: Vector2 = _random_spawn_position(screen_size)
+
+	var attempts := 0
+	while player1_position.distance_to(player2_position) < config.spawn_buffer_between_players and attempts < 100:
+		player2_position = _random_spawn_position(screen_size)
+		attempts += 1
+
+	_spawn_player(player1_position, randf_range(0.0, TAU), config.player_one_color)
+	_spawn_player(player2_position, randf_range(0.0, TAU), config.player_two_color)
+
+
+func _random_spawn_position(screen_size: Vector2) -> Vector2:
+	var buffer: float = config.spawn_buffer_from_edges
+	return Vector2(
+		randf_range(buffer, screen_size.x - buffer),
+		randf_range(buffer, screen_size.y - buffer)
+	)
+
+
+func _spawn_player(spawn_position: Vector2, angle: float, color: Color) -> void:
+	var player: Player = PlayerScene.instantiate()
+	player.color = color
+	add_child(player)
+	player.position = spawn_position
+	player.rotation = angle
