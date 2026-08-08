@@ -24,6 +24,8 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_update_screen_size)
 	if not Engine.is_editor_hint():
 		call_deferred("_create_shadows")
+		target.child_entered_tree.connect(_on_target_child_entered_tree)
+		target.child_exiting_tree.connect(_on_target_child_exiting_tree)
 
 
 func _exit_tree() -> void:
@@ -102,6 +104,27 @@ func _create_shadows() -> void:
 		_set_shadow_collision_enabled(shadow, false)
 		target.get_parent().add_child(shadow)
 		_shadows.append(shadow)
+
+
+# The target's visual can be swapped at runtime after shadows are built
+# (e.g. Player switching between its ship and pilot visuals), so shadows
+# must mirror child add/remove rather than being frozen at creation time.
+func _on_target_child_entered_tree(node: Node) -> void:
+	if node is Wrap2D:
+		return
+	for shadow in _shadows:
+		var copy := node.duplicate()
+		_clear_groups(copy)
+		_strip_wrap_children(copy)
+		_set_shadow_collision_enabled(copy, shadow.visible)
+		shadow.add_child(copy)
+
+
+func _on_target_child_exiting_tree(node: Node) -> void:
+	for shadow in _shadows:
+		var copy := shadow.get_node_or_null(node.name)
+		if copy:
+			copy.queue_free()
 
 
 func _get_wrap_directions() -> Array[Vector2i]:
