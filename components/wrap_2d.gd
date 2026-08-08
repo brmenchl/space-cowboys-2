@@ -26,6 +26,12 @@ func _ready() -> void:
 		call_deferred("_create_shadows")
 
 
+func _exit_tree() -> void:
+	for shadow in _shadows:
+		if is_instance_valid(shadow):
+			shadow.queue_free()
+
+
 func _get_configuration_warnings() -> PackedStringArray:
 	if not target or not target is Node2D:
 		return ["No valid target set for the Wrap2D Component!"]
