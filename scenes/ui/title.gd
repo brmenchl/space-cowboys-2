@@ -13,4 +13,4 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_play_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/waiting_room.tscn")
+	get_tree().change_scene_to_file("res://scenes/ui/waiting_room.tscn")

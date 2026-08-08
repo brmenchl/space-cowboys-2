@@ -35,7 +35,7 @@ func _update_labels() -> void:
 
 
 func _on_back_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/title.tscn")
+	get_tree().change_scene_to_file("res://scenes/ui/title.tscn")
 
 
 func _on_start_pressed() -> void:

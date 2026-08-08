@@ -1,0 +1,110 @@
+extends Node
+class_name Spawner
+
+const PlayerScene := preload("res://scenes/player.tscn")
+const ShipHullScene := preload("res://scenes/ship_hull.tscn")
+const AsteroidScene := preload("res://scenes/asteroid.tscn")
+
+@export var config: GameConfig = preload("res://resources/game_config.tres")
+@export var ship_movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
+
+var _ship_spawn_timer: Timer
+var _asteroid_spawn_timer: Timer
+
+
+func _ready() -> void:
+	_ship_spawn_timer = _create_spawn_timer(_on_ship_spawn_timer_timeout)
+	_asteroid_spawn_timer = _create_spawn_timer(_on_asteroid_spawn_timer_timeout)
+	_restart_spawn_timer(_ship_spawn_timer, config.min_ship_spawn_interval, config.max_ship_spawn_interval)
+	_restart_spawn_timer(_asteroid_spawn_timer, config.min_asteroid_spawn_interval, config.max_asteroid_spawn_interval)
+
+
+func spawn_player(color: Color, input_prefix: String) -> Player:
+	var screen_size: Vector2 = get_viewport().get_visible_rect().size
+	var player: Player = PlayerScene.instantiate()
+	player.color = color
+	player.input_prefix = input_prefix
+	add_child(player)
+	player.global_position = _find_spawn_position(screen_size, _all_entity_positions())
+	player.rotation = randf_range(0.0, TAU)
+	return player
+
+
+func _create_spawn_timer(on_timeout: Callable) -> Timer:
+	var timer := Timer.new()
+	timer.one_shot = true
+	timer.timeout.connect(on_timeout)
+	add_child(timer)
+	return timer
+
+
+func _restart_spawn_timer(timer: Timer, min_interval: float, max_interval: float) -> void:
+	timer.start(randf_range(min_interval, max_interval))
+
+
+func _on_ship_spawn_timer_timeout() -> void:
+	if _count_ships() < config.max_ships:
+		_spawn_ship()
+	_restart_spawn_timer(_ship_spawn_timer, config.min_ship_spawn_interval, config.max_ship_spawn_interval)
+
+
+func _on_asteroid_spawn_timer_timeout() -> void:
+	if get_tree().get_nodes_in_group("asteroids").size() < config.max_asteroids:
+		_spawn_asteroid()
+	_restart_spawn_timer(_asteroid_spawn_timer, config.min_asteroid_spawn_interval, config.max_asteroid_spawn_interval)
+
+
+func _count_ships() -> int:
+	var count := get_tree().get_nodes_in_group("ship_hulls").size()
+	for player in get_tree().get_nodes_in_group("players"):
+		if not player.is_ejected:
+			count += 1
+	return count
+
+
+func _all_entity_positions() -> Array:
+	var positions: Array = []
+	for group in ["players", "ship_hulls", "asteroids"]:
+		for entity in get_tree().get_nodes_in_group(group):
+			positions.append(entity.global_position)
+	return positions
+
+
+func _spawn_ship() -> void:
+	var screen_size: Vector2 = get_viewport().get_visible_rect().size
+	var hull: ShipHull = ShipHullScene.instantiate()
+	hull.movement_config = ship_movement_config
+	add_child(hull)
+	hull.global_position = _find_spawn_position(screen_size, _all_entity_positions())
+	hull.rotation = randf_range(0.0, TAU)
+
+
+func _spawn_asteroid() -> void:
+	var screen_size: Vector2 = get_viewport().get_visible_rect().size
+	var asteroid: Asteroid = AsteroidScene.instantiate()
+	add_child(asteroid)
+	asteroid.global_position = _find_spawn_position(screen_size, _all_entity_positions())
+
+
+func _find_spawn_position(screen_size: Vector2, existing_positions: Array) -> Vector2:
+	var spawn_position := _random_spawn_position(screen_size)
+	var attempts := 0
+	while _is_too_close(spawn_position, existing_positions) and attempts < 100:
+		spawn_position = _random_spawn_position(screen_size)
+		attempts += 1
+	return spawn_position
+
+
+func _is_too_close(spawn_position: Vector2, existing_positions: Array) -> bool:
+	for other_position in existing_positions:
+		if spawn_position.distance_to(other_position) < config.spawn_buffer_between_entities:
+			return true
+	return false
+
+
+func _random_spawn_position(screen_size: Vector2) -> Vector2:
+	var buffer: float = config.spawn_buffer_from_edges
+	return Vector2(
+		randf_range(buffer, screen_size.x - buffer),
+		randf_range(buffer, screen_size.y - buffer)
+	)
