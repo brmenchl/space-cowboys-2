@@ -38,8 +38,8 @@ func _spawn_players() -> void:
 		player2_position = _random_spawn_position(screen_size)
 		attempts += 1
 
-	_spawn_player(player1_position, randf_range(0.0, TAU), config.player_one_color)
-	_spawn_player(player2_position, randf_range(0.0, TAU), config.player_two_color)
+	_spawn_player(player1_position, randf_range(0.0, TAU), config.player_one_color, "p1")
+	_spawn_player(player2_position, randf_range(0.0, TAU), config.player_two_color, "p2")
 
 
 func _random_spawn_position(screen_size: Vector2) -> Vector2:
@@ -50,9 +50,10 @@ func _random_spawn_position(screen_size: Vector2) -> Vector2:
 	)
 
 
-func _spawn_player(spawn_position: Vector2, angle: float, color: Color) -> void:
+func _spawn_player(spawn_position: Vector2, angle: float, color: Color, input_prefix: String) -> void:
 	var player: Player = PlayerScene.instantiate()
 	player.color = color
+	player.input_prefix = input_prefix
 	add_child(player)
 	player.position = spawn_position
 	player.rotation = angle
