@@ -122,7 +122,7 @@ func _on_target_child_entered_tree(node: Node) -> void:
 
 func _on_target_child_exiting_tree(node: Node) -> void:
 	for shadow in _shadows:
-		var copy := shadow.get_node_or_null(node.name)
+		var copy := shadow.get_node_or_null(NodePath(node.name))
 		if copy:
 			copy.queue_free()
 
