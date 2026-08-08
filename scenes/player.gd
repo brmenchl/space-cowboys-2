@@ -8,6 +8,10 @@ const BulletScene := preload("res://scenes/bullet.tscn")
 # configurable muzzle_offset.
 const TIP_LENGTH := 24.0
 
+signal health_changed(new_health: int)
+
+const MAX_HEALTH := 100
+
 @export var color: Color = Color.WHITE
 @export var input_prefix: String = "p1"
 @export var movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
@@ -15,6 +19,7 @@ const TIP_LENGTH := 24.0
 @onready var polygon: Polygon2D = $Polygon2D
 
 var angular_velocity: float = 0.0
+var health: int = MAX_HEALTH
 
 
 func _ready() -> void:
