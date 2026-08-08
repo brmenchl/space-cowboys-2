@@ -10,6 +10,7 @@ enum State { IDLE, EXTENDING, ATTACHED, RETRACTING }
 
 var state: State = State.IDLE
 var attach_point: Vector2 = Vector2.ZERO
+var attach_body: Node2D = null
 
 var _shooter: Node2D
 var _current_length: float = 0.0
@@ -49,11 +50,21 @@ func release() -> void:
 		_start_retracting()
 
 
+func reset() -> void:
+	state = State.IDLE
+	_current_length = 0.0
+	_tip_local = Vector2.ZERO
+	attach_body = null
+	visible = false
+	queue_redraw()
+
+
 func _start_extending() -> void:
 	state = State.EXTENDING
 	_current_length = 0.0
 	_time_alive = 0.0
 	_tip_local = Vector2.ZERO
+	attach_body = null
 	visible = true
 
 
@@ -68,6 +79,8 @@ func _physics_process(delta: float) -> void:
 		State.RETRACTING:
 			_process_retracting(delta)
 		State.ATTACHED:
+			if attach_body and is_instance_valid(attach_body):
+				attach_point = attach_body.global_position
 			_tip_local = to_local(attach_point)
 
 	if state != State.IDLE:
@@ -97,6 +110,7 @@ func _on_hook_body_entered(body: Node2D) -> void:
 		return
 	if _is_valid_target(body):
 		attach_point = hook_area.global_position
+		attach_body = body
 		state = State.ATTACHED
 
 

@@ -26,6 +26,7 @@ func setup(player: Player, title: String) -> void:
 	player.ship_health_changed.connect(_on_ship_health_changed)
 	player.pilot_health_changed.connect(_on_pilot_health_changed)
 	player.ejected.connect(_on_ejected)
+	player.boarded.connect(_on_boarded)
 	player.visual_changed.connect(_on_visual_changed)
 	_on_visual_changed(player.active_visual_scene)
 
@@ -59,3 +60,7 @@ func _on_pilot_health_changed(new_health: int) -> void:
 
 func _on_ejected() -> void:
 	_ship_health_bar.visible = false
+
+
+func _on_boarded() -> void:
+	_ship_health_bar.visible = true

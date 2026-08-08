@@ -1,10 +1,6 @@
-[gd_resource type="Resource" script_class="GameConfig" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="GameConfig" format=3 uid="uid://dipraxffj11er"]
 
-[ext_resource type="Script" path="res://resources/game_config.gd" id="1"]
+[ext_resource type="Script" uid="uid://b64hel6ar40ff" path="res://resources/game_config.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
-spawn_buffer_between_players = 200.0
-spawn_buffer_from_edges = 80.0
-player_one_color = Color(0.2, 0.4, 1, 1)
-player_two_color = Color(1, 0.2, 0.2, 1)

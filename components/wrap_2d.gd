@@ -97,6 +97,7 @@ func _create_shadows() -> void:
 		var shadow: Node2D = target.duplicate()
 		shadow.set_script(null)
 		_strip_wrap_children(shadow)
+		_clear_groups(shadow)
 		shadow.visible = false
 		_set_shadow_collision_enabled(shadow, false)
 		target.get_parent().add_child(shadow)
@@ -117,6 +118,15 @@ func _get_wrap_directions() -> Array[Vector2i]:
 				continue
 			dirs.append(Vector2i(x, y))
 	return dirs
+
+
+# duplicate() copies group membership, but a shadow is a stripped-down visual
+# echo, not a real entity, so it must not show up in gameplay group queries.
+func _clear_groups(node: Node) -> void:
+	for group in node.get_groups():
+		node.remove_from_group(group)
+	for child in node.get_children():
+		_clear_groups(child)
 
 
 func _strip_wrap_children(node: Node) -> void:
