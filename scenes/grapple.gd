@@ -123,39 +123,56 @@ func _process_retracting(delta: float) -> void:
 		queue_redraw()
 
 
-# The hook tip is allowed to touch its target (that's how it attaches), but
-# anything else crossing the rope's own length between the shooter and the
-# tip snags the line, so we cast just short of the tip to catch that without
-# re-triggering on the object the hook is already latched onto.
+# Attachment is decided by the near-tip circle check below, not here - this
+# ray only asks whether the rope's own length, shooter to tip, has snagged
+# on something along the way, so any hit at all (valid target or not) is a
+# mid-rope obstruction and resets the grapple.
 func _check_rope_intersection() -> void:
-	var trimmed_length := _current_length - config.hook_radius
-	if trimmed_length <= 0.0:
+	if state == State.EXTENDING and _try_attach_near_tip():
 		return
 
-	var local_dir := _tip_local.normalized() if _tip_local.length() > 0.0 else Vector2.RIGHT
 	var space_state := get_world_2d().direct_space_state
-	var query := PhysicsRayQueryParameters2D.create(global_position, to_global(local_dir * trimmed_length))
-	query.exclude = [_shooter.get_rid()]
+	var tip_global := to_global(_tip_local)
+	var exclude: Array[RID] = [_shooter.get_rid()]
 	if attach_body and is_instance_valid(attach_body):
-		query.exclude.append(attach_body.get_rid())
-	# hook_area's overlap detection lags a physics frame behind _tip_local, so
-	# whatever it's currently touching counts as "the tip" even before the
-	# body_entered signal (and attach_body) catches up.
-	for body in hook_area.get_overlapping_bodies():
-		query.exclude.append(body.get_rid())
+		exclude.append(attach_body.get_rid())
+	var query := PhysicsRayQueryParameters2D.create(global_position, tip_global)
+	query.exclude = exclude
 
-	if space_state.intersect_ray(query):
+	if not space_state.intersect_ray(query).is_empty():
 		reset()
+
+
+func _try_attach_near_tip() -> bool:
+	var tip_global := to_global(_tip_local)
+	var space_state := get_world_2d().direct_space_state
+	var query := PhysicsShapeQueryParameters2D.new()
+	query.shape = hook_collision.shape
+	query.transform = Transform2D(0.0, tip_global)
+	query.exclude = [_shooter.get_rid()]
+	query.collide_with_bodies = true
+	query.collide_with_areas = false
+
+	for overlap in space_state.intersect_shape(query):
+		var body: Node2D = overlap.collider
+		if _is_valid_target(body):
+			_attach(body, tip_global)
+			return true
+	return false
 
 
 func _on_hook_body_entered(body: Node2D) -> void:
 	if state != State.EXTENDING or body == _shooter:
 		return
 	if _is_valid_target(body):
-		attach_point = hook_area.global_position
-		attach_body = body
-		_rope_length = _current_length
-		state = State.ATTACHED
+		_attach(body, hook_area.global_position)
+
+
+func _attach(body: Node2D, point: Vector2) -> void:
+	attach_point = point
+	attach_body = body
+	_rope_length = _current_length
+	state = State.ATTACHED
 
 
 func _is_valid_target(body: Node2D) -> bool:
