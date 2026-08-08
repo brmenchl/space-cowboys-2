@@ -18,6 +18,8 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		_on_back_pressed()
+	elif event.is_action_pressed("ui_accept") and start_button.visible:
+		_on_start_pressed()
 	elif event.is_action_pressed("p1_action1") and not player1_ready:
 		player1_ready = true
 		_update_labels()
