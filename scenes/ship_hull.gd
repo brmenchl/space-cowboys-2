@@ -31,3 +31,7 @@ func take_damage(amount: int) -> void:
 	health = maxi(health - amount, 0)
 	if health == 0:
 		queue_free()
+
+
+func is_boardable() -> bool:
+	return true

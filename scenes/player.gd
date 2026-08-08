@@ -53,6 +53,8 @@ func _physics_process(delta: float) -> void:
 	else:
 		_process_thrust(delta)
 	move_and_slide()
+	if is_ejected:
+		_process_grapple_swing()
 	_process_shooting(delta)
 	_process_grapple()
 	_process_ejecting()
@@ -78,13 +80,32 @@ func _process_thrust(delta: float) -> void:
 
 
 func _process_pilot_drift(delta: float) -> void:
-	if grapple.is_pulling():
-		velocity = global_position.direction_to(grapple.attach_point) * grapple_config.pull_speed
-		if global_position.distance_to(grapple.attach_point) <= grapple_config.arrival_distance:
-			_board_ship(grapple.attach_body)
-			grapple.reset()
-	else:
-		velocity -= velocity * movement_config.linear_friction * delta
+	velocity -= velocity * movement_config.linear_friction * delta
+
+
+# Keeps the pilot on a taut, shrinking rope: any velocity component pulling
+# away from the attach point is cancelled, but the tangential component
+# survives, so residual sideways drift turns into a swing around the target
+# as the rope reels in rather than a straight-line teleport toward it.
+func _process_grapple_swing() -> void:
+	if not grapple.is_pulling():
+		return
+
+	var offset := global_position - grapple.attach_point
+	var distance := offset.length()
+	var rope_length := grapple.rope_length()
+
+	if distance > rope_length and distance > 0.0:
+		var radial := offset / distance
+		global_position = grapple.attach_point + radial * rope_length
+		velocity -= radial * velocity.dot(radial)
+		distance = rope_length
+
+	if distance <= grapple_config.arrival_distance:
+		var target := grapple.attach_body
+		if target and is_instance_valid(target) and target.is_boardable():
+			_board_ship(target)
+		grapple.reset()
 
 
 func _process_shooting(delta: float) -> void:
@@ -152,6 +173,10 @@ func force_eject() -> ShipHull:
 	var hull := _spawn_drifting_hull()
 	_become_pilot()
 	return hull
+
+
+func is_boardable() -> bool:
+	return not is_ejected
 
 
 func _board_ship(target: Node2D) -> void:

@@ -18,6 +18,7 @@ var _current_length: float = 0.0
 var _time_alive: float = 0.0
 var _tip_local: Vector2 = Vector2.ZERO
 var _links: Array[Node2D] = []
+var _rope_length: float = 0.0
 
 
 func _ready() -> void:
@@ -35,6 +36,10 @@ func is_engaged() -> bool:
 
 func is_pulling() -> bool:
 	return state == State.ATTACHED
+
+
+func rope_length() -> float:
+	return _rope_length
 
 
 func handle_action_pressed() -> void:
@@ -57,6 +62,7 @@ func reset() -> void:
 	_current_length = 0.0
 	_tip_local = Vector2.ZERO
 	attach_body = null
+	_rope_length = 0.0
 	visible = false
 	_clear_links()
 	queue_redraw()
@@ -68,6 +74,7 @@ func _start_extending() -> void:
 	_time_alive = 0.0
 	_tip_local = Vector2.ZERO
 	attach_body = null
+	_rope_length = 0.0
 	visible = true
 	_clear_links()
 
@@ -85,6 +92,7 @@ func _physics_process(delta: float) -> void:
 		State.ATTACHED:
 			if attach_body and is_instance_valid(attach_body):
 				attach_point = attach_body.global_position
+			_rope_length = maxf(_rope_length - config.pull_speed * delta, 0.0)
 			_tip_local = to_local(attach_point)
 
 	if state != State.IDLE:
@@ -117,11 +125,12 @@ func _on_hook_body_entered(body: Node2D) -> void:
 	if _is_valid_target(body):
 		attach_point = hook_area.global_position
 		attach_body = body
+		_rope_length = _current_length
 		state = State.ATTACHED
 
 
 func _is_valid_target(body: Node2D) -> bool:
-	if body is ShipHull:
+	if body is ShipHull or body is Asteroid:
 		return true
 	if body is Player:
 		return not body.is_ejected
