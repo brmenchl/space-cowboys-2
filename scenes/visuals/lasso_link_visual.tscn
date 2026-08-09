@@ -6,3 +6,4 @@
 texture_filter = 1
 texture = ExtResource("1")
 centered = false
+offset = Vector2(0, -2)

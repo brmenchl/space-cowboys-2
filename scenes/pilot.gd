@@ -26,9 +26,9 @@ func _ready() -> void:
 	add_to_group("pilots")
 	if health <= 0:
 		health = pilot_max_health
-	modulate = color
 	lasso.config = lasso_config
 	var visual := visual_scene.instantiate()
+	visual.modulate = color
 	add_child(visual)
 
 
