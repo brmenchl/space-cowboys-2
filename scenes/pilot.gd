@@ -20,6 +20,7 @@ signal boarding_requested(ship: Ship)
 var angular_velocity: float = 0.0
 
 var _shoot_cooldown: float = 0.0
+var _visual: AnimatedSprite2D
 
 
 func _ready() -> void:
@@ -27,9 +28,10 @@ func _ready() -> void:
 	if health <= 0:
 		health = pilot_max_health
 	lasso.config = lasso_config
-	var visual := visual_scene.instantiate()
-	visual.modulate = color
-	add_child(visual)
+	_visual = visual_scene.instantiate()
+	_visual.modulate = color
+	_visual.animation_finished.connect(_on_visual_animation_finished)
+	add_child(_visual)
 
 
 func _physics_process(delta: float) -> void:
@@ -84,6 +86,7 @@ func _process_shooting(delta: float) -> void:
 		return
 	if Input.is_action_pressed(input_prefix + "_action1"):
 		_shoot()
+		_visual.play("shoot")
 		_shoot_cooldown = 1.0 / bullet_config.fire_rate
 
 
@@ -107,3 +110,8 @@ func _shoot() -> void:
 
 func _die() -> void:
 	pass
+
+
+func _on_visual_animation_finished() -> void:
+	if _visual.animation == "shoot":
+		_visual.play("idle")

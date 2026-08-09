@@ -1,7 +1,9 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
 
-[node name="ShipVisualBruiser" type="Polygon2D"]
-polygon = PackedVector2Array(-18, -14, 4, -9, 4, 9, -18, 14)
+[ext_resource type="Texture2D" path="res://assets/ships/bruiser_ship.png" id="1"]
 
-[node name="Nose" type="Polygon2D" parent="."]
-polygon = PackedVector2Array(4, -9, 24, 0, 4, 9)
+[node name="ShipVisualBruiser" type="Sprite2D"]
+texture_filter = 1
+rotation = -1.5708
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("1")

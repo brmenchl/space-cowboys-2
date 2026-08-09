@@ -1,4 +1,0 @@
-[gd_scene format=3]
-
-[node name="ShipVisual" type="Polygon2D"]
-polygon = PackedVector2Array(24, 0, -16, 10, -16, -10)
