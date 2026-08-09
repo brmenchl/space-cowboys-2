@@ -1,6 +1,11 @@
 extends Node2D
 class_name Bullet
 
+# Each bullet_visual_*.tscn sprite is scaled so it reads clearly at this
+# radius; scaling further by config.radius / BASE_RADIUS keeps the visible
+# size in sync whenever a config's radius is tuned.
+const BASE_RADIUS := 8.0
+
 @export var config: BulletConfig = preload("res://resources/bullet_config.tres")
 
 @onready var area: Area2D = $Area2D
@@ -16,6 +21,7 @@ var _time_alive: float = 0.0
 func _ready() -> void:
 	var visual := config.visual_scene.instantiate()
 	visual.modulate = color
+	visual.scale *= config.radius / BASE_RADIUS
 	add_child(visual)
 
 	var shape := CircleShape2D.new()

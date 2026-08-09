@@ -4,4 +4,5 @@
 
 [node name="BulletVisual" type="Sprite2D"]
 texture_filter = 1
+scale = Vector2(1.231, 1.231)
 texture = ExtResource("1")
