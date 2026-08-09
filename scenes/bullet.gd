@@ -2,20 +2,20 @@ extends Node2D
 class_name Bullet
 
 @export var config: BulletConfig = preload("res://resources/bullet_config.tres")
-@export var visual_scene: PackedScene = preload("res://scenes/visuals/bullet_visual.tscn")
 
 @onready var area: Area2D = $Area2D
 @onready var collision_shape: CollisionShape2D = $Area2D/CollisionShape2D
 
 var velocity: Vector2 = Vector2.ZERO
 var shooter: Node2D = null
+var color: Color = Color.WHITE
 
 var _time_alive: float = 0.0
 
 
 func _ready() -> void:
-	var visual := visual_scene.instantiate()
-	visual.modulate = config.color
+	var visual := config.visual_scene.instantiate()
+	visual.modulate = color
 	add_child(visual)
 
 	var shape := CircleShape2D.new()

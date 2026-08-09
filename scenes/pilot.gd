@@ -96,8 +96,10 @@ func _shoot() -> void:
 	var facing := Vector2.RIGHT.rotated(rotation)
 	var bullet: Bullet = BulletScene.instantiate()
 	bullet.config = bullet_config
+	bullet.color = color
 	get_tree().current_scene.add_child(bullet)
 	bullet.global_position = global_position + facing * bullet_config.muzzle_distance
+	bullet.rotation = facing.angle() + PI / 2.0
 	bullet.velocity = facing * bullet_config.speed
 	bullet.shooter = self
 	velocity -= facing * recoil_force

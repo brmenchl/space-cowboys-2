@@ -17,9 +17,9 @@ func _ready() -> void:
 	shape.radius = radius
 	collision_shape.shape = shape
 
-	var visual := visual_scene.instantiate()
-	visual.modulate = config.color
-	visual.scale = Vector2.ONE * radius
+	var visual: Sprite2D = visual_scene.instantiate()
+	visual.modulate = config.colors.pick_random()
+	visual.scale = Vector2.ONE * radius / (visual.texture.get_size().x / 2.0)
 	add_child(visual)
 
 	var direction := Vector2.RIGHT.rotated(randf_range(0.0, TAU))

@@ -1,4 +1,7 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
 
-[node name="AsteroidVisual" type="Polygon2D"]
-polygon = PackedVector2Array(1, 0, 0.924, 0.3827, 0.707, 0.707, 0.3827, 0.924, 0, 1, -0.3827, 0.924, -0.707, 0.707, -0.924, 0.3827, -1, 0, -0.924, -0.3827, -0.707, -0.707, -0.3827, -0.924, 0, -1, 0.3827, -0.924, 0.707, -0.707, 0.924, -0.3827)
+[ext_resource type="Texture2D" path="res://assets/asteroids/asteroid_large.png" id="1"]
+
+[node name="AsteroidVisual" type="Sprite2D"]
+texture_filter = 1
+texture = ExtResource("1")
