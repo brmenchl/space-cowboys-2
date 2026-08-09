@@ -1,0 +1,265 @@
+[gd_scene format=3 uid="uid://c21y22rjbpnac"]
+
+[ext_resource type="Script" uid="uid://d4bv8yeq67fyh" path="res://scenes/ui/settings.gd" id="1"]
+
+[node name="Settings" type="Control" unique_id=1281827797]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="BackButton" type="Button" parent="." unique_id=757633775]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 140.0
+offset_bottom = 60.0
+text = "< Back"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="." unique_id=37628459]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="ScrollContainer" unique_id=2116686889]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 60
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 60
+theme_override_constants/margin_bottom = 60
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer/MarginContainer" unique_id=1185615345]
+layout_mode = 2
+theme_override_constants/separation = 36
+
+[node name="TitleLabel" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer" unique_id=1084792997]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="ShipSection" type="VBoxContainer" parent="ScrollContainer/MarginContainer/VBoxContainer" unique_id=1423519211]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection" unique_id=1040258744]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Ship Controls"
+horizontal_alignment = 1
+
+[node name="GridCenter" type="CenterContainer" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection" unique_id=1339348301]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter" unique_id=1231285080]
+layout_mode = 2
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="Blank" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=493938280]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="P1Header" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=1070909128]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player 1"
+horizontal_alignment = 1
+
+[node name="P2Header" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=427185493]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player 2"
+horizontal_alignment = 1
+
+[node name="MovementLabel" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=1124627121]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Movement"
+
+[node name="MovementP1" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=1467464664]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "WASD"
+horizontal_alignment = 1
+
+[node name="MovementP2" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=683351699]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Arrow Keys"
+horizontal_alignment = 1
+
+[node name="ShootLabel" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=656635698]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Shoot"
+
+[node name="ShootP1" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=567341263]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "F"
+horizontal_alignment = 1
+
+[node name="ShootP2" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=1256402387]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "/"
+horizontal_alignment = 1
+
+[node name="EjectLabel" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=1122687565]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Eject"
+
+[node name="EjectP1" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=1367088786]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "G"
+horizontal_alignment = 1
+
+[node name="EjectP2" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/GridCenter/Grid" unique_id=1480287111]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "."
+horizontal_alignment = 1
+
+[node name="EjectParagraphCenter" type="CenterContainer" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection" unique_id=924285738]
+layout_mode = 2
+
+[node name="EjectParagraph" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/ShipSection/EjectParagraphCenter" unique_id=1888080043]
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Hit Eject any time to bail out of your ship and go it alone as your cowboy."
+autowrap_mode = 3
+
+[node name="CowboySection" type="VBoxContainer" parent="ScrollContainer/MarginContainer/VBoxContainer" unique_id=246438407]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection" unique_id=1771935724]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Cowboy Controls"
+horizontal_alignment = 1
+
+[node name="GridCenter" type="CenterContainer" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection" unique_id=258852651]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter" unique_id=148924009]
+layout_mode = 2
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="Blank" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=1837663972]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+
+[node name="P1Header" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=618391161]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player 1"
+horizontal_alignment = 1
+
+[node name="P2Header" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=1510729555]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player 2"
+horizontal_alignment = 1
+
+[node name="MovementLabel" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=2042680506]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Movement"
+
+[node name="MovementP1" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=1587157506]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "WASD"
+horizontal_alignment = 1
+
+[node name="MovementP2" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=1299125018]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Arrow Keys"
+horizontal_alignment = 1
+
+[node name="ShootLabel" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=1853805942]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Shoot"
+
+[node name="ShootP1" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=202248734]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "F"
+horizontal_alignment = 1
+
+[node name="ShootP2" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=148355844]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "/"
+horizontal_alignment = 1
+
+[node name="LassoLabel" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=1624750219]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Lasso"
+
+[node name="LassoP1" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=532458552]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "G"
+horizontal_alignment = 1
+
+[node name="LassoP2" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/GridCenter/Grid" unique_id=415730128]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "."
+horizontal_alignment = 1
+
+[node name="MovementParagraphCenter" type="CenterContainer" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection" unique_id=1453114051]
+layout_mode = 2
+
+[node name="MovementParagraph" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/MovementParagraphCenter" unique_id=1397254249]
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Cowboys don't have rockets, so drifting through space is all momentum - but a six-shooter packs a punch, and a good cowboy knows how to use that recoil to kick themselves in the direction they need to go."
+autowrap_mode = 3
+
+[node name="LassoParagraphCenter" type="CenterContainer" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection" unique_id=847125361]
+layout_mode = 2
+
+[node name="LassoParagraph" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/CowboySection/LassoParagraphCenter" unique_id=188081124]
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Lasso a ship, reel yourself in, and board it! If there's an enemy cowboy on board, you'll kick them right out into space. You can also lasso other objects, like asteroids - a good cowboy can use the lasso to slingshot themselves around space."
+autowrap_mode = 3
+
+[node name="HealthParagraphCenter" type="CenterContainer" parent="ScrollContainer/MarginContainer/VBoxContainer" unique_id=631619687]
+layout_mode = 2
+
+[node name="HealthParagraph" type="Label" parent="ScrollContainer/MarginContainer/VBoxContainer/HealthParagraphCenter" unique_id=1151325142]
+custom_minimum_size = Vector2(700, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Health & Winning: while you're in your ship, you can rely on it to absorb damage - but once your ship loses all its health, your cowboy gets shot out into space! Your cowboy doesn't have much health on their own, so find another ship and don't linger out there too long - once your cowboy dies, it's game over."
+autowrap_mode = 3
