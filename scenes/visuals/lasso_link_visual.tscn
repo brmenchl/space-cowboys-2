@@ -1,4 +1,8 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
 
-[node name="LassoLinkVisual" type="Polygon2D"]
-polygon = PackedVector2Array(0, -0.5, 1, -0.5, 1, 0.5, 0, 0.5)
+[ext_resource type="Texture2D" path="res://assets/lasso/rope_segment.png" id="1"]
+
+[node name="LassoLinkVisual" type="Sprite2D"]
+texture_filter = 1
+texture = ExtResource("1")
+centered = false

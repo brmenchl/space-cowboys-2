@@ -194,7 +194,6 @@ func _update_links() -> void:
 	var link_count := int(_current_length / config.link_spacing)
 	while _links.size() < link_count:
 		var link: Node2D = link_visual_scene.instantiate()
-		link.modulate = config.color
 		add_child(link)
 		_links.append(link)
 	while _links.size() > link_count:
@@ -202,10 +201,11 @@ func _update_links() -> void:
 
 	var direction := _tip_local.normalized() if _tip_local.length() > 0.0 else Vector2.RIGHT
 	for i in range(_links.size()):
-		var link: Node2D = _links[i]
+		var link: Sprite2D = _links[i]
+		var texture_size := link.texture.get_size()
 		link.position = direction * config.link_spacing * i
 		link.rotation = direction.angle()
-		link.scale = Vector2(config.link_spacing, config.line_width)
+		link.scale = Vector2(config.link_spacing / texture_size.x, config.line_width / texture_size.y)
 
 
 func _clear_links() -> void:
