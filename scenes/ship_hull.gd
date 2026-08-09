@@ -1,36 +1,30 @@
-extends CharacterBody2D
+extends Damageable
 class_name ShipHull
 
 const HULL_COLOR := Color(0.5, 0.5, 0.5)
 
-@export var movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
-@export var health_config: HealthConfig = preload("res://resources/health_config.tres")
-@export var visual_scene: PackedScene = preload("res://scenes/visuals/ship_visual.tscn")
+@export var ship_config: ShipConfig = preload("res://resources/ship_config_fighter.tres")
+
+@onready var collision_shape: CollisionPolygon2D = $CollisionPolygon2D
 
 var angular_velocity: float = 0.0
-var health: int = 0
 
 
 func _ready() -> void:
 	add_to_group("ship_hulls")
 	modulate = HULL_COLOR
-	add_child(visual_scene.instantiate())
+	collision_shape.polygon = ship_config.collision_polygon
+	add_child(ship_config.visual_scene.instantiate())
 	if health <= 0:
-		health = health_config.ship_max_health
+		health = ship_config.max_health
 
 
 func _physics_process(delta: float) -> void:
-	angular_velocity -= angular_velocity * movement_config.angular_friction * delta
+	angular_velocity -= angular_velocity * ship_config.movement_config.angular_friction * delta
 	rotation += angular_velocity * delta
 
-	velocity -= velocity * movement_config.linear_friction * delta
+	velocity -= velocity * ship_config.movement_config.linear_friction * delta
 	move_and_slide()
-
-
-func take_damage(amount: int) -> void:
-	health = maxi(health - amount, 0)
-	if health == 0:
-		queue_free()
 
 
 func is_boardable() -> bool:

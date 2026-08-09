@@ -6,7 +6,7 @@ class_name GrappleConfig
 @export var retract_speed: float = 2400.0
 @export var pull_speed: float = 1000.0
 @export var arrival_distance: float = 20.0
-@export var hook_radius: float = 8.0
+@export var hook_radius: float = 6.0
 @export var line_width: float = 3.0
 @export var link_spacing: float = 12.0
 @export var color: Color = Color(0.45, 0.29, 0.13)

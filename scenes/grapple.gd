@@ -185,7 +185,7 @@ func _attach(body: Node2D, point: Vector2) -> void:
 
 
 func _is_valid_target(body: Node2D) -> bool:
-	if body is ShipHull or body is Asteroid:
+	if body is Damageable:
 		return true
 	if body is Player:
 		return not body.is_ejected

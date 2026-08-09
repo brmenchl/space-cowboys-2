@@ -36,9 +36,6 @@ func _on_body_entered(body: Node2D) -> void:
 	if body is Player and body != shooter:
 		body.take_damage(config.damage)
 		queue_free()
-	elif body is Asteroid:
-		body.take_damage(config.damage)
-		queue_free()
-	elif body is ShipHull:
+	elif body is Damageable:
 		body.take_damage(config.damage)
 		queue_free()

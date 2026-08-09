@@ -6,7 +6,10 @@ const ShipHullScene := preload("res://scenes/ship_hull.tscn")
 const AsteroidScene := preload("res://scenes/asteroid.tscn")
 
 @export var config: GameConfig = preload("res://resources/game_config.tres")
-@export var ship_movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
+@export var ship_configs: Array[ShipConfig] = [
+	preload("res://resources/ship_config_fighter.tres"),
+	preload("res://resources/ship_config_bruiser.tres"),
+]
 
 var _ship_spawn_timer: Timer
 var _asteroid_spawn_timer: Timer
@@ -17,6 +20,7 @@ func _ready() -> void:
 	_asteroid_spawn_timer = _create_spawn_timer(_on_asteroid_spawn_timer_timeout)
 	_restart_spawn_timer(_ship_spawn_timer, config.min_ship_spawn_interval, config.max_ship_spawn_interval)
 	_restart_spawn_timer(_asteroid_spawn_timer, config.min_asteroid_spawn_interval, config.max_asteroid_spawn_interval)
+	_spawn_asteroid()
 
 
 func spawn_player(color: Color, input_prefix: String) -> Player:
@@ -73,10 +77,24 @@ func _all_entity_positions() -> Array:
 func _spawn_ship() -> void:
 	var screen_size: Vector2 = get_viewport().get_visible_rect().size
 	var hull: ShipHull = ShipHullScene.instantiate()
-	hull.movement_config = ship_movement_config
+	hull.ship_config = _pick_ship_config()
 	add_child(hull)
 	hull.global_position = _find_spawn_position(screen_size, _all_entity_positions())
 	hull.rotation = randf_range(0.0, TAU)
+
+
+func _pick_ship_config() -> ShipConfig:
+	var total_weight := 0.0
+	for ship_config in ship_configs:
+		total_weight += ship_config.spawn_weight
+
+	var roll := randf_range(0.0, total_weight)
+	var cumulative_weight := 0.0
+	for ship_config in ship_configs:
+		cumulative_weight += ship_config.spawn_weight
+		if roll <= cumulative_weight:
+			return ship_config
+	return ship_configs[-1]
 
 
 func _spawn_asteroid() -> void:

@@ -1,4 +1,4 @@
-extends RigidBody2D
+extends Damageable
 class_name Asteroid
 
 @export var config: AsteroidConfig = preload("res://resources/asteroid_config.tres")
@@ -6,32 +6,27 @@ class_name Asteroid
 
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
-var health: int
-
 
 func _ready() -> void:
 	add_to_group("asteroids")
-	gravity_scale = 0.0
 	health = config.max_health
 
+	var radius := randf_range(config.min_radius, config.max_radius)
+
 	var shape := CircleShape2D.new()
-	shape.radius = config.radius
+	shape.radius = radius
 	collision_shape.shape = shape
 
 	var visual := visual_scene.instantiate()
 	visual.modulate = config.color
-	visual.scale = Vector2.ONE * config.radius
+	visual.scale = Vector2.ONE * radius
 	add_child(visual)
 
 	var direction := Vector2.RIGHT.rotated(randf_range(0.0, TAU))
-	linear_velocity = direction * randf_range(0.0, config.max_speed)
+	velocity = direction * randf_range(0.0, config.max_speed)
 
 
-func take_damage(amount: int) -> void:
-	health = maxi(health - amount, 0)
-	if health == 0:
-		queue_free()
+func _physics_process(delta: float) -> void:
+	position += velocity * delta
 
 
-func is_boardable() -> bool:
-	return false

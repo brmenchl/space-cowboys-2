@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="HealthConfig" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://resources/health_config.gd" id="1"]
-
-[resource]
-script = ExtResource("1")
-ship_max_health = 100
-pilot_max_health = 15

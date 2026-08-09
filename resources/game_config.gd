@@ -10,6 +10,6 @@ class_name GameConfig
 @export var min_ship_spawn_interval: float = 30.0
 @export var max_ship_spawn_interval: float = 90.0
 
-@export var max_asteroids: int = 2
+@export var max_asteroids: int = 4
 @export var min_asteroid_spawn_interval: float = 30.0
 @export var max_asteroid_spawn_interval: float = 90.0

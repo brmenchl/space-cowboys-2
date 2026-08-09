@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[node name="ShipVisualBruiser" type="Polygon2D"]
+polygon = PackedVector2Array(-18, -14, 4, -9, 4, 9, -18, 14)
+
+[node name="Nose" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(4, -9, 24, 0, 4, 9)

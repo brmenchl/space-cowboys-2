@@ -12,11 +12,9 @@ signal visual_changed(visual_scene: PackedScene)
 
 @export var color: Color = Color.WHITE
 @export var input_prefix: String = "p1"
-@export var movement_config: ShipMovementConfig = preload("res://resources/ship_movement_config.tres")
-@export var health_config: HealthConfig = preload("res://resources/health_config.tres")
-@export var ship_visual_scene: PackedScene = preload("res://scenes/visuals/ship_visual.tscn")
+@export var ship_config: ShipConfig = preload("res://resources/ship_config_fighter.tres")
+@export var pilot_max_health: int = 15
 @export var pilot_visual_scene: PackedScene = preload("res://scenes/visuals/pilot_visual.tscn")
-@export var ship_bullet_config: BulletConfig = preload("res://resources/bullet_config.tres")
 @export var pilot_bullet_config: BulletConfig = preload("res://resources/pilot_bullet_config.tres")
 @export var pilot_recoil_force: float = 250.0
 @export var grapple_config: GrappleConfig = preload("res://resources/grapple_config.tres")
@@ -39,12 +37,13 @@ var _shoot_cooldown: float = 0.0
 
 func _ready() -> void:
 	add_to_group("players")
-	ship_health = health_config.ship_max_health
-	pilot_health = health_config.pilot_max_health
+	ship_health = ship_config.max_health
+	pilot_health = pilot_max_health
 	modulate = color
 	pilot_collision.disabled = true
+	ship_collision.polygon = ship_config.collision_polygon
 	grapple.config = grapple_config
-	_set_visual(ship_visual_scene)
+	_set_visual(ship_config.visual_scene)
 
 
 func _physics_process(delta: float) -> void:
@@ -63,9 +62,9 @@ func _physics_process(delta: float) -> void:
 
 func _process_turning(delta: float) -> void:
 	var turn_input := Input.get_action_strength(input_prefix + "_move_right") - Input.get_action_strength(input_prefix + "_move_left")
-	angular_velocity += turn_input * movement_config.angular_acceleration * delta
-	angular_velocity -= angular_velocity * movement_config.angular_friction * delta
-	angular_velocity = clampf(angular_velocity, -movement_config.max_angular_speed, movement_config.max_angular_speed)
+	angular_velocity += turn_input * ship_config.movement_config.angular_acceleration * delta
+	angular_velocity -= angular_velocity * ship_config.movement_config.angular_friction * delta
+	angular_velocity = clampf(angular_velocity, -ship_config.movement_config.max_angular_speed, ship_config.movement_config.max_angular_speed)
 	rotation += angular_velocity * delta
 
 
@@ -74,14 +73,14 @@ func _process_thrust(delta: float) -> void:
 	var brake_input := Input.get_action_strength(input_prefix + "_move_down")
 	var facing := Vector2.RIGHT.rotated(rotation)
 
-	velocity += facing * thrust_input * movement_config.acceleration * delta
-	velocity -= facing * brake_input * movement_config.deceleration * delta
-	velocity -= velocity * movement_config.linear_friction * delta
-	velocity = velocity.limit_length(movement_config.max_speed)
+	velocity += facing * thrust_input * ship_config.movement_config.acceleration * delta
+	velocity -= facing * brake_input * ship_config.movement_config.deceleration * delta
+	velocity -= velocity * ship_config.movement_config.linear_friction * delta
+	velocity = velocity.limit_length(ship_config.movement_config.max_speed)
 
 
 func _process_pilot_drift(delta: float) -> void:
-	velocity -= velocity * movement_config.linear_friction * delta
+	velocity -= velocity * ship_config.movement_config.linear_friction * delta
 
 
 # Keeps the pilot on a taut, shrinking rope: any velocity component pulling
@@ -117,7 +116,7 @@ func _process_shooting(delta: float) -> void:
 	if _shoot_cooldown > 0.0:
 		return
 	if Input.is_action_pressed(input_prefix + "_action1"):
-		var config: BulletConfig = pilot_bullet_config if is_ejected else ship_bullet_config
+		var config: BulletConfig = pilot_bullet_config if is_ejected else ship_config.bullet_config
 		_shoot(config)
 		_shoot_cooldown = 1.0 / config.fire_rate
 
@@ -193,12 +192,14 @@ func _board_ship(target: Node2D) -> void:
 	velocity = hull.velocity
 	angular_velocity = hull.angular_velocity
 	ship_health = hull.health
+	ship_config = hull.ship_config
 	hull.queue_free()
 
 	is_ejected = false
 	ship_collision.disabled = false
 	pilot_collision.disabled = true
-	_set_visual(ship_visual_scene)
+	ship_collision.polygon = ship_config.collision_polygon
+	_set_visual(ship_config.visual_scene)
 	ship_health_changed.emit(ship_health)
 	boarded.emit()
 
@@ -219,13 +220,13 @@ func _become_pilot() -> void:
 
 func _spawn_drifting_hull() -> ShipHull:
 	var hull: ShipHull = ShipHullScene.instantiate()
+	hull.ship_config = ship_config
+	hull.health = ship_health
 	get_tree().current_scene.add_child(hull)
 	hull.global_position = global_position
 	hull.rotation = rotation
 	hull.velocity = velocity
 	hull.angular_velocity = angular_velocity
-	hull.movement_config = movement_config
-	hull.health = ship_health
 	return hull
 
 

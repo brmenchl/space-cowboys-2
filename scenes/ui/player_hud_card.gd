@@ -18,9 +18,9 @@ func setup(player: Player, title: String) -> void:
 	_player = player
 	_title_label.text = title
 
-	_ship_health_bar.max_value = player.health_config.ship_max_health
+	_ship_health_bar.max_value = player.ship_config.max_health
 	_ship_health_bar.value = player.ship_health
-	_pilot_health_bar.max_value = player.health_config.pilot_max_health
+	_pilot_health_bar.max_value = player.pilot_max_health
 	_pilot_health_bar.value = player.pilot_health
 
 	player.ship_health_changed.connect(_on_ship_health_changed)
@@ -63,4 +63,5 @@ func _on_ejected() -> void:
 
 
 func _on_boarded() -> void:
+	_ship_health_bar.max_value = _player.ship_config.max_health
 	_ship_health_bar.visible = true
