@@ -179,6 +179,7 @@ func _update_shadows() -> void:
 			var offset := Vector2(dir.x * screen_size.x, dir.y * screen_size.y)
 			shadow.global_position = target.global_position + offset
 			shadow.global_rotation = target.global_rotation
+			shadow.modulate = target.modulate
 
 
 func _is_direction_active(dir: Vector2i) -> bool:

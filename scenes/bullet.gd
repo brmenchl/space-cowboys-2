@@ -8,7 +8,7 @@ class_name Bullet
 @onready var collision_shape: CollisionShape2D = $Area2D/CollisionShape2D
 
 var velocity: Vector2 = Vector2.ZERO
-var shooter: Player = null
+var shooter: Node2D = null
 
 var _time_alive: float = 0.0
 
@@ -33,9 +33,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _on_body_entered(body: Node2D) -> void:
-	if body is Player and body != shooter:
-		body.take_damage(config.damage)
-		queue_free()
-	elif body is Damageable:
+	if body == shooter:
+		return
+	if body is Damageable:
 		body.take_damage(config.damage)
 		queue_free()

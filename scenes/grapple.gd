@@ -185,11 +185,7 @@ func _attach(body: Node2D, point: Vector2) -> void:
 
 
 func _is_valid_target(body: Node2D) -> bool:
-	if body is Damageable:
-		return true
-	if body is Player:
-		return not body.is_ejected
-	return false
+	return body is Damageable
 
 
 # Links spawn and grow out from the pilot as the rope extends, one segment

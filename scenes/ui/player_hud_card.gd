@@ -6,7 +6,8 @@ class_name PlayerHudCard
 @onready var _ship_health_bar: ProgressBar = $Margin/VBox/ShipHealthBar
 @onready var _pilot_health_bar: ProgressBar = $Margin/VBox/PilotHealthBar
 
-var _player: Player
+var _controller: PlayerController
+var _active_body: Node2D
 var _portrait_visual: Node2D
 
 
@@ -14,33 +15,32 @@ func _ready() -> void:
 	_portrait_container.resized.connect(_center_portrait)
 
 
-func setup(player: Player, title: String) -> void:
-	_player = player
+func setup(controller: PlayerController, title: String) -> void:
+	_controller = controller
 	_title_label.text = title
 
-	_ship_health_bar.max_value = player.ship_config.max_health
-	_ship_health_bar.value = player.ship_health
-	_pilot_health_bar.max_value = player.pilot_max_health
-	_pilot_health_bar.value = player.pilot_health
+	_ship_health_bar.max_value = controller.current_ship.ship_config.max_health
+	_ship_health_bar.value = controller.current_ship.health
+	_pilot_health_bar.max_value = controller.pilot_max_health
+	_pilot_health_bar.value = controller.pilot_health
 
-	player.ship_health_changed.connect(_on_ship_health_changed)
-	player.pilot_health_changed.connect(_on_pilot_health_changed)
-	player.ejected.connect(_on_ejected)
-	player.boarded.connect(_on_boarded)
-	player.visual_changed.connect(_on_visual_changed)
-	_on_visual_changed(player.active_visual_scene)
+	controller.ship_health_changed.connect(_on_ship_health_changed)
+	controller.pilot_health_changed.connect(_on_pilot_health_changed)
+	controller.ejected.connect(_on_ejected)
+	controller.boarded.connect(_on_boarded)
+	_on_boarded(controller.current_ship)
 
 
 func _process(_delta: float) -> void:
-	if is_instance_valid(_player) and is_instance_valid(_portrait_visual):
-		_portrait_visual.rotation = _player.rotation
+	if is_instance_valid(_active_body) and is_instance_valid(_portrait_visual):
+		_portrait_visual.rotation = _active_body.rotation
 
 
-func _on_visual_changed(visual_scene: PackedScene) -> void:
+func _set_visual(visual_scene: PackedScene) -> void:
 	if _portrait_visual:
 		_portrait_visual.queue_free()
 	_portrait_visual = visual_scene.instantiate()
-	_portrait_visual.modulate = _player.color
+	_portrait_visual.modulate = _controller.color
 	_portrait_container.add_child(_portrait_visual)
 	_center_portrait()
 
@@ -58,10 +58,14 @@ func _on_pilot_health_changed(new_health: int) -> void:
 	_pilot_health_bar.value = new_health
 
 
-func _on_ejected() -> void:
+func _on_ejected(pilot: Pilot) -> void:
+	_active_body = pilot
 	_ship_health_bar.visible = false
+	_set_visual(pilot.visual_scene)
 
 
-func _on_boarded() -> void:
-	_ship_health_bar.max_value = _player.ship_config.max_health
+func _on_boarded(ship: Ship) -> void:
+	_active_body = ship
+	_ship_health_bar.max_value = ship.ship_config.max_health
 	_ship_health_bar.visible = true
+	_set_visual(ship.ship_config.visual_scene)

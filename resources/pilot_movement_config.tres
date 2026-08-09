@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ShipMovementConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://resources/ship_movement_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+acceleration = 0.0
+deceleration = 0.0
+linear_friction = 0.6
+max_speed = 400.0
+angular_acceleration = 8.0
+angular_friction = 4.0
+max_angular_speed = 3.5

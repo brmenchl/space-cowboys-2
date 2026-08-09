@@ -1,8 +1,7 @@
 extends Node
 class_name Spawner
 
-const PlayerScene := preload("res://scenes/player.tscn")
-const ShipHullScene := preload("res://scenes/ship_hull.tscn")
+const ShipScene := preload("res://scenes/ship.tscn")
 const AsteroidScene := preload("res://scenes/asteroid.tscn")
 
 @export var config: GameConfig = preload("res://resources/game_config.tres")
@@ -23,15 +22,19 @@ func _ready() -> void:
 	_spawn_asteroid()
 
 
-func spawn_player(color: Color, input_prefix: String) -> Player:
+func spawn_player(color: Color, input_prefix: String) -> PlayerController:
 	var screen_size: Vector2 = get_viewport().get_visible_rect().size
-	var player: Player = PlayerScene.instantiate()
-	player.color = color
-	player.input_prefix = input_prefix
-	add_child(player)
-	player.global_position = _find_spawn_position(screen_size, _all_entity_positions())
-	player.rotation = randf_range(0.0, TAU)
-	return player
+	var ship: Ship = ShipScene.instantiate()
+	add_child(ship)
+	ship.global_position = _find_spawn_position(screen_size, _all_entity_positions())
+	ship.rotation = randf_range(0.0, TAU)
+
+	var controller := PlayerController.new()
+	controller.color = color
+	controller.input_prefix = input_prefix
+	add_child(controller)
+	controller.possess_ship(ship)
+	return controller
 
 
 func _create_spawn_timer(on_timeout: Callable) -> Timer:
@@ -59,16 +62,12 @@ func _on_asteroid_spawn_timer_timeout() -> void:
 
 
 func _count_ships() -> int:
-	var count := get_tree().get_nodes_in_group("ship_hulls").size()
-	for player in get_tree().get_nodes_in_group("players"):
-		if not player.is_ejected:
-			count += 1
-	return count
+	return get_tree().get_nodes_in_group("ships").size()
 
 
 func _all_entity_positions() -> Array:
 	var positions: Array = []
-	for group in ["players", "ship_hulls", "asteroids"]:
+	for group in ["ships", "pilots", "asteroids"]:
 		for entity in get_tree().get_nodes_in_group(group):
 			positions.append(entity.global_position)
 	return positions
@@ -76,11 +75,11 @@ func _all_entity_positions() -> Array:
 
 func _spawn_ship() -> void:
 	var screen_size: Vector2 = get_viewport().get_visible_rect().size
-	var hull: ShipHull = ShipHullScene.instantiate()
-	hull.ship_config = _pick_ship_config()
-	add_child(hull)
-	hull.global_position = _find_spawn_position(screen_size, _all_entity_positions())
-	hull.rotation = randf_range(0.0, TAU)
+	var ship: Ship = ShipScene.instantiate()
+	ship.ship_config = _pick_ship_config()
+	add_child(ship)
+	ship.global_position = _find_spawn_position(screen_size, _all_entity_positions())
+	ship.rotation = randf_range(0.0, TAU)
 
 
 func _pick_ship_config() -> ShipConfig:
