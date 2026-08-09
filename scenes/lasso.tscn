@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://dasnfpih8jwd4"]
 
-[ext_resource type="Script" uid="uid://b36fjvqk3h54q" path="res://scenes/grapple.gd" id="1"]
+[ext_resource type="Script" uid="uid://b36fjvqk3h54q" path="res://scenes/lasso.gd" id="1"]
 
-[node name="Grapple" type="Node2D" unique_id=1632175721]
+[node name="Lasso" type="Node2D" unique_id=1632175721]
 script = ExtResource("1")
 
 [node name="HookArea" type="Area2D" parent="." unique_id=171122443]

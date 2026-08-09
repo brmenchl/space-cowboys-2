@@ -1,4 +1,4 @@
 [gd_scene format=3]
 
-[node name="GrappleLinkVisual" type="Polygon2D"]
+[node name="LassoLinkVisual" type="Polygon2D"]
 polygon = PackedVector2Array(0, -0.5, 1, -0.5, 1, 0.5, 0, 0.5)

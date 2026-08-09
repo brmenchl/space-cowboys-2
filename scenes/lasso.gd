@@ -1,10 +1,10 @@
 extends Node2D
-class_name Grapple
+class_name Lasso
 
 enum State { IDLE, EXTENDING, ATTACHED, RETRACTING }
 
-@export var config: GrappleConfig = preload("res://resources/grapple_config.tres")
-@export var link_visual_scene: PackedScene = preload("res://scenes/visuals/grapple_link_visual.tscn")
+@export var config: LassoConfig = preload("res://resources/lasso_config.tres")
+@export var link_visual_scene: PackedScene = preload("res://scenes/visuals/lasso_link_visual.tscn")
 
 @onready var hook_area: Area2D = $HookArea
 @onready var hook_collision: CollisionShape2D = $HookArea/CollisionShape2D
@@ -135,7 +135,7 @@ func _process_retracting(delta: float) -> void:
 # Attachment is decided by the near-tip circle check below, not here - this
 # ray only asks whether the rope's own length, shooter to tip, has snagged
 # on something along the way, so any hit at all (valid target or not) is a
-# mid-rope obstruction and resets the grapple.
+# mid-rope obstruction and resets the lasso.
 func _check_rope_intersection() -> void:
 	if state == State.EXTENDING and _try_attach_near_tip():
 		return

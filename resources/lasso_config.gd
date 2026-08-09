@@ -1,5 +1,5 @@
 extends Resource
-class_name GrappleConfig
+class_name LassoConfig
 
 @export var extend_speed: float = 600.0
 @export var time_to_live: float = 1.0

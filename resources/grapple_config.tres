@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="GrappleConfig" format=3 uid="uid://bdoxspex0ry8p"]
-
-[ext_resource type="Script" uid="uid://b1nqm361qrhjl" path="res://resources/grapple_config.gd" id="1"]
-
-[resource]
-script = ExtResource("1")

@@ -12,10 +12,10 @@ signal boarding_requested(ship: Ship)
 @export var bullet_config: BulletConfig = preload("res://resources/pilot_bullet_config.tres")
 @export var movement_config: ShipMovementConfig = preload("res://resources/pilot_movement_config.tres")
 @export var recoil_force: float = 250.0
-@export var grapple_config: GrappleConfig = preload("res://resources/grapple_config.tres")
+@export var lasso_config: LassoConfig = preload("res://resources/lasso_config.tres")
 
 @onready var collision: CollisionPolygon2D = $CollisionPolygon2D
-@onready var grapple: Grapple = $Grapple
+@onready var lasso: Lasso = $Lasso
 
 var angular_velocity: float = 0.0
 
@@ -27,7 +27,7 @@ func _ready() -> void:
 	if health <= 0:
 		health = pilot_max_health
 	modulate = color
-	grapple.config = grapple_config
+	lasso.config = lasso_config
 	var visual := visual_scene.instantiate()
 	add_child(visual)
 
@@ -36,10 +36,10 @@ func _physics_process(delta: float) -> void:
 	_process_turning(delta)
 	_process_drift(delta)
 	move_and_slide()
-	if grapple.is_pulling():
-		_process_grapple_swing()
+	if lasso.is_pulling():
+		_process_lasso_swing()
 	_process_shooting(delta)
-	_process_grapple()
+	_process_lasso()
 
 
 func _process_turning(delta: float) -> void:
@@ -58,27 +58,27 @@ func _process_drift(delta: float) -> void:
 # away from the attach point is cancelled, but the tangential component
 # survives, so residual sideways drift turns into a swing around the target
 # as the rope reels in rather than a straight-line teleport toward it.
-func _process_grapple_swing() -> void:
-	var offset := global_position - grapple.attach_point
+func _process_lasso_swing() -> void:
+	var offset := global_position - lasso.attach_point
 	var distance := offset.length()
-	var rope_length := grapple.rope_length()
+	var rope_length := lasso.rope_length()
 
 	if distance > rope_length and distance > 0.0:
 		var radial := offset / distance
-		global_position = grapple.attach_point + radial * rope_length
+		global_position = lasso.attach_point + radial * rope_length
 		velocity -= radial * velocity.dot(radial)
 		distance = rope_length
 
-	if distance <= grapple_config.arrival_distance:
-		var target := grapple.attach_body
+	if distance <= lasso_config.arrival_distance:
+		var target := lasso.attach_body
 		if target is Ship and target.is_boardable():
 			boarding_requested.emit(target)
-		grapple.reset()
+		lasso.reset()
 
 
 func _process_shooting(delta: float) -> void:
 	_shoot_cooldown = maxf(_shoot_cooldown - delta, 0.0)
-	if grapple.is_engaged():
+	if lasso.is_engaged():
 		return
 	if _shoot_cooldown > 0.0:
 		return
@@ -87,9 +87,9 @@ func _process_shooting(delta: float) -> void:
 		_shoot_cooldown = 1.0 / bullet_config.fire_rate
 
 
-func _process_grapple() -> void:
+func _process_lasso() -> void:
 	if Input.is_action_just_pressed(input_prefix + "_action2"):
-		grapple.handle_action_pressed()
+		lasso.handle_action_pressed()
 
 
 func _shoot() -> void:
