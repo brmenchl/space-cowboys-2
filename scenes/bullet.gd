@@ -6,7 +6,7 @@ class_name Bullet
 # size in sync whenever a config's radius is tuned.
 const BASE_RADIUS := 8.0
 
-@export var config: BulletConfig = preload("res://resources/bullet_config.tres")
+@export var config: BulletConfig = preload("res://resources/bullet_config_fighter.tres")
 
 @onready var area: Area2D = $Area2D
 @onready var collision_shape: CollisionShape2D = $Area2D/CollisionShape2D
