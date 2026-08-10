@@ -139,6 +139,16 @@ func _create_shadows() -> void:
 # _update_ghost_shapes) so the ghost shape doesn't spin around the body's
 # origin as the body rotates.
 func _create_ghost_shapes() -> void:
+	# RigidBody2D defaults to CENTER_OF_MASS_MODE_AUTO, which recomputes the
+	# center of mass from whichever shapes are currently enabled. Ghost shapes
+	# are real shapes on this same body and sit a full screen away when active,
+	# so left on AUTO the center of mass would jump off the body the moment a
+	# ghost activates near an edge, turning torque (e.g. from turning input)
+	# into a visible translation instead of a clean rotation. Locking it to
+	# its real (pre-ghost) value keeps it fixed regardless of ghost state.
+	target.center_of_mass_mode = RigidBody2D.CENTER_OF_MASS_MODE_CUSTOM
+	target.center_of_mass = target.center_of_mass
+
 	var body_rid: RID = target.get_rid()
 	for shape_def in _collect_shape_defs(target):
 		for dir in _shadow_dirs:
