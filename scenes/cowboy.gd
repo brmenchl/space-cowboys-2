@@ -1,5 +1,5 @@
 extends Damageable
-class_name Pilot
+class_name Cowboy
 
 const BulletScene := preload("res://scenes/bullet.tscn")
 
@@ -7,10 +7,10 @@ signal boarding_requested(ship: Ship)
 
 @export var color: Color = Color.WHITE
 @export var input_prefix: String = ""
-@export var pilot_max_health: int = 15
-@export var visual_scene: PackedScene = preload("res://scenes/visuals/pilot_visual.tscn")
-@export var bullet_config: BulletConfig = preload("res://resources/pilot_bullet_config.tres")
-@export var movement_config: ShipMovementConfig = preload("res://resources/pilot_movement_config.tres")
+@export var cowboy_max_health: int = 15
+@export var visual_scene: PackedScene = preload("res://scenes/visuals/cowboy_visual.tscn")
+@export var bullet_config: BulletConfig = preload("res://resources/cowboy_bullet_config.tres")
+@export var movement_config: ShipMovementConfig = preload("res://resources/cowboy_movement_config.tres")
 @export var recoil_force: float = 250.0
 @export var lasso_config: LassoConfig = preload("res://resources/lasso_config.tres")
 
@@ -24,9 +24,9 @@ var _visual: AnimatedSprite2D
 
 
 func _ready() -> void:
-	add_to_group("pilots")
+	add_to_group("cowboys")
 	if health <= 0:
-		health = pilot_max_health
+		health = cowboy_max_health
 	lasso.config = lasso_config
 	_visual = visual_scene.instantiate()
 	_visual.modulate = color
@@ -56,7 +56,7 @@ func _process_drift(delta: float) -> void:
 	velocity -= velocity * movement_config.linear_friction * delta
 
 
-# Keeps the pilot on a taut, shrinking rope: any velocity component pulling
+# Keeps the cowboy on a taut, shrinking rope: any velocity component pulling
 # away from the attach point is cancelled, but the tangential component
 # survives, so residual sideways drift turns into a swing around the target
 # as the rope reels in rather than a straight-line teleport toward it.

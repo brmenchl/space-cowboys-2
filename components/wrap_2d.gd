@@ -107,7 +107,7 @@ func _create_shadows() -> void:
 
 
 # The target's visual can be swapped at runtime after shadows are built
-# (e.g. Player switching between its ship and pilot visuals), so shadows
+# (e.g. Player switching between its ship and cowboy visuals), so shadows
 # must mirror child add/remove rather than being frozen at creation time.
 func _on_target_child_entered_tree(node: Node) -> void:
 	if node is Wrap2D:

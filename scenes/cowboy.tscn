@@ -1,10 +1,10 @@
 [gd_scene load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://scenes/pilot.gd" id="1"]
+[ext_resource type="Script" path="res://scenes/cowboy.gd" id="1"]
 [ext_resource type="Script" path="res://components/wrap_2d.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/lasso.tscn" id="3"]
 
-[node name="Pilot" type="CharacterBody2D"]
+[node name="Cowboy" type="CharacterBody2D"]
 process_mode = 1
 motion_mode = 1
 script = ExtResource("1")

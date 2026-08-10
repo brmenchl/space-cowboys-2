@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bsi1t136jglde"
-path="res://.godot/imported/pilot_shoot_0.png-c9f9a97625fd0a9e7277857dac6e1fb1.ctex"
+path="res://.godot/imported/cowboy_shoot_0.png-5dd65d3df2bb24f512c8daf8b2b1d847.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/pilot/pilot_shoot_0.png"
-dest_files=["res://.godot/imported/pilot_shoot_0.png-c9f9a97625fd0a9e7277857dac6e1fb1.ctex"]
+source_file="res://assets/cowboy/cowboy_shoot_0.png"
+dest_files=["res://.godot/imported/cowboy_shoot_0.png-5dd65d3df2bb24f512c8daf8b2b1d847.ctex"]
 
 [params]
 

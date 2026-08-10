@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bgnee7oo87ujc"
-path="res://.godot/imported/pilot_idle.png-d3db469e361085a021b6c65541cffecb.ctex"
+path="res://.godot/imported/cowboy_idle.png-a73ea23435b902d2d4a90cd5487d9a2b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/pilot/pilot_idle.png"
-dest_files=["res://.godot/imported/pilot_idle.png-d3db469e361085a021b6c65541cffecb.ctex"]
+source_file="res://assets/cowboy/cowboy_idle.png"
+dest_files=["res://.godot/imported/cowboy_idle.png-a73ea23435b902d2d4a90cd5487d9a2b.ctex"]
 
 [params]
 

@@ -188,7 +188,7 @@ func _is_valid_target(body: Node2D) -> bool:
 	return body is Damageable
 
 
-# Links spawn and grow out from the pilot as the rope extends, one segment
+# Links spawn and grow out from the cowboy as the rope extends, one segment
 # per link_spacing of current length, rather than a single stretched line.
 func _update_links() -> void:
 	var link_count := int(_current_length / config.link_spacing)

@@ -67,7 +67,7 @@ func _count_ships() -> int:
 
 func _all_entity_positions() -> Array:
 	var positions: Array = []
-	for group in ["ships", "pilots", "asteroids"]:
+	for group in ["ships", "cowboys", "asteroids"]:
 		for entity in get_tree().get_nodes_in_group(group):
 			positions.append(entity.global_position)
 	return positions

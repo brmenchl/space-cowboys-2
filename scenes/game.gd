@@ -43,11 +43,11 @@ func _spawn_players() -> void:
 	player1_card.setup(player1, "Player 1")
 	player2_card.setup(player2, "Player 2")
 
-	player1.pilot_health_changed.connect(_on_player_pilot_health_changed.bind("Player 2"))
-	player2.pilot_health_changed.connect(_on_player_pilot_health_changed.bind("Player 1"))
+	player1.cowboy_health_changed.connect(_on_player_cowboy_health_changed.bind("Player 2"))
+	player2.cowboy_health_changed.connect(_on_player_cowboy_health_changed.bind("Player 1"))
 
 
-func _on_player_pilot_health_changed(new_health: int, winner_name: String) -> void:
+func _on_player_cowboy_health_changed(new_health: int, winner_name: String) -> void:
 	if new_health == 0:
 		win_label.text = winner_name.to_upper() + " WINS"
 		win_popup.visible = true

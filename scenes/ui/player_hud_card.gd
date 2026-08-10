@@ -4,7 +4,7 @@ class_name PlayerHudCard
 @onready var _title_label: Label = $Margin/VBox/TitleLabel
 @onready var _portrait_container: Control = $Margin/VBox/Portrait
 @onready var _ship_health_bar: ProgressBar = $Margin/VBox/ShipHealthBar
-@onready var _pilot_health_bar: ProgressBar = $Margin/VBox/PilotHealthBar
+@onready var _cowboy_health_bar: ProgressBar = $Margin/VBox/CowboyHealthBar
 
 var _controller: PlayerController
 var _active_body: Node2D
@@ -21,11 +21,11 @@ func setup(controller: PlayerController, title: String) -> void:
 
 	_ship_health_bar.max_value = controller.current_ship.ship_config.max_health
 	_ship_health_bar.value = controller.current_ship.health
-	_pilot_health_bar.max_value = controller.pilot_max_health
-	_pilot_health_bar.value = controller.pilot_health
+	_cowboy_health_bar.max_value = controller.cowboy_max_health
+	_cowboy_health_bar.value = controller.cowboy_health
 
 	controller.ship_health_changed.connect(_on_ship_health_changed)
-	controller.pilot_health_changed.connect(_on_pilot_health_changed)
+	controller.cowboy_health_changed.connect(_on_cowboy_health_changed)
 	controller.ejected.connect(_on_ejected)
 	controller.boarded.connect(_on_boarded)
 	_on_boarded(controller.current_ship)
@@ -54,14 +54,14 @@ func _on_ship_health_changed(new_health: int) -> void:
 	_ship_health_bar.value = new_health
 
 
-func _on_pilot_health_changed(new_health: int) -> void:
-	_pilot_health_bar.value = new_health
+func _on_cowboy_health_changed(new_health: int) -> void:
+	_cowboy_health_bar.value = new_health
 
 
-func _on_ejected(pilot: Pilot) -> void:
-	_active_body = pilot
+func _on_ejected(cowboy: Cowboy) -> void:
+	_active_body = cowboy
 	_ship_health_bar.visible = false
-	_set_visual(pilot.visual_scene)
+	_set_visual(cowboy.visual_scene)
 
 
 func _on_boarded(ship: Ship) -> void:

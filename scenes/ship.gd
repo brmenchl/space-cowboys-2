@@ -3,9 +3,9 @@ class_name Ship
 
 const HULL_COLOR := Color(0.5, 0.5, 0.5)
 const BulletScene := preload("res://scenes/bullet.tscn")
-const PilotScene := preload("res://scenes/pilot.tscn")
+const CowboyScene := preload("res://scenes/cowboy.tscn")
 
-signal pilot_ejected(pilot: Pilot)
+signal cowboy_ejected(cowboy: Cowboy)
 
 @export var ship_config: ShipConfig = preload("res://resources/ship_config_fighter.tres")
 @export var eject_force: float = 120.0
@@ -104,26 +104,26 @@ func _die() -> void:
 	queue_free()
 
 
-# Launches the pilot out to the side with a kick while the ship itself keeps
+# Launches the cowboy out to the side with a kick while the ship itself keeps
 # its current position/rotation/velocity, so it's left drifting exactly where
 # it was rather than being reset or replaced by a separate wreck object.
 func _eject() -> void:
 	var eject_direction := Vector2.RIGHT.rotated(randf_range(0.0, TAU))
 
-	var pilot: Pilot = PilotScene.instantiate()
-	pilot.color = color
-	pilot.input_prefix = input_prefix
-	get_tree().current_scene.add_child(pilot)
-	pilot.global_position = global_position + eject_direction * eject_distance
-	pilot.rotation = rotation
-	pilot.velocity = eject_direction * eject_force
+	var cowboy: Cowboy = CowboyScene.instantiate()
+	cowboy.color = color
+	cowboy.input_prefix = input_prefix
+	get_tree().current_scene.add_child(cowboy)
+	cowboy.global_position = global_position + eject_direction * eject_distance
+	cowboy.rotation = rotation
+	cowboy.velocity = eject_direction * eject_force
 
 	is_piloted = false
 	input_prefix = ""
 	color = HULL_COLOR
 	modulate = HULL_COLOR
 
-	pilot_ejected.emit(pilot)
+	cowboy_ejected.emit(cowboy)
 
 
 func _set_visual(visual_scene: PackedScene) -> void:
