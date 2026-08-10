@@ -136,3 +136,12 @@ func _set_visual(visual_scene: PackedScene) -> void:
 		_visual.queue_free()
 	_visual = visual_scene.instantiate()
 	add_child(_visual)
+	# CollisionPolygon2D only registers with a direct-parent CollisionObject2D,
+	# but the visual scenes nest it under their own Node2D root for editing
+	# convenience, so pull it back out onto the ship itself.
+	for child in _visual.get_children():
+		if child is CollisionPolygon2D:
+			var shape_transform: Transform2D = child.transform
+			_visual.remove_child(child)
+			add_child(child)
+			child.transform = shape_transform
