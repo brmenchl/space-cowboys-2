@@ -100,7 +100,8 @@ func possess(new_color: Color, new_input_prefix: String) -> void:
 
 
 func _die() -> void:
-	_eject()
+	if is_piloted:
+		_eject()
 	queue_free()
 
 
