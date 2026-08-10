@@ -1,15 +1,16 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://cusmsyn6guuum"]
 
-[ext_resource type="Script" path="res://scenes/ship.gd" id="1"]
-[ext_resource type="Script" path="res://components/wrap_2d.gd" id="2"]
+[ext_resource type="Script" uid="uid://blrgg2w0feotb" path="res://scenes/ship.gd" id="1"]
+[ext_resource type="Script" uid="uid://byrfcpq7880bl" path="res://components/wrap_2d.gd" id="2"]
 
-[node name="Ship" type="RigidBody2D"]
+[node name="Ship" type="RigidBody2D" unique_id=103425517]
 process_mode = 1
 script = ExtResource("1")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1322290124]
 polygon = PackedVector2Array(24, 0, -16, 10, -16, -10)
 
-[node name="Wrap2D" type="Node" parent="."]
+[node name="Wrap2D" type="Node" parent="." unique_id=1150689459 node_paths=PackedStringArray("target")]
 script = ExtResource("2")
+target = NodePath("..")
 wrap_vertically = true

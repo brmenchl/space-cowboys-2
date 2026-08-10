@@ -14,7 +14,6 @@ layer = -1
 
 [node name="SpaceBackground" parent="Background" unique_id=278307877 instance=ExtResource("4")]
 anchors_preset = 15
-stretch_mode = 6
 
 [node name="Spawner" type="Node" parent="." unique_id=1996892420]
 script = ExtResource("3")
