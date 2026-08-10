@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c21y22rjbpnac"]
 
 [ext_resource type="Script" uid="uid://d4bv8yeq67fyh" path="res://scenes/ui/settings.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/ui/menu_background.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/ui/space_background.tscn" id="2_7pacj"]
 
 [node name="Settings" type="Control" unique_id=1281827797]
 layout_mode = 3
@@ -12,8 +12,20 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="MenuBackground" parent="." instance=ExtResource("2")]
-layout_mode = 0
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1828470837]
+layer = -1
+
+[node name="SpaceBackground" parent="CanvasLayer" instance=ExtResource("2_7pacj")]
+anchors_preset = 15
+stretch_mode = 6
+
+[node name="DimBackground" type="ColorRect" parent="CanvasLayer" unique_id=1173251458]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
 
 [node name="BackButton" type="Button" parent="." unique_id=757633775]
 layout_mode = 0

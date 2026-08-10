@@ -1,26 +1,42 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://bh1esxpu7jqg2"]
 
-[ext_resource type="Script" path="res://scenes/ui/waiting_room.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/ui/menu_background.tscn" id="2"]
+[ext_resource type="Script" uid="uid://d4cv4d3me52nr" path="res://scenes/ui/waiting_room.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/space_background.tscn" id="2_tkqs2"]
 
-[node name="WaitingRoom" type="Control"]
+[node name="WaitingRoom" type="Control" unique_id=1084830520]
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="MenuBackground" parent="." instance=ExtResource("2")]
-layout_mode = 0
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=92630225]
+layer = -1
 
-[node name="BackButton" type="Button" parent="."]
+[node name="SpaceBackground" parent="CanvasLayer" instance=ExtResource("2_tkqs2")]
+anchors_preset = 15
+stretch_mode = 6
+
+[node name="DimBackground" type="ColorRect" parent="CanvasLayer" unique_id=1905802134]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="BackButton" type="Button" parent="." unique_id=586798135]
+layout_mode = 0
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 140.0
 offset_bottom = 60.0
 text = "< Back"
 
-[node name="Player1Card" type="PanelContainer" parent="."]
+[node name="Player1Card" type="PanelContainer" parent="." unique_id=1477440802]
+layout_mode = 0
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 40.0
@@ -29,19 +45,22 @@ offset_right = 320.0
 offset_bottom = -40.0
 grow_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="Player1Card"]
+[node name="MarginContainer" type="MarginContainer" parent="Player1Card" unique_id=2136340852]
+layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="Label" type="Label" parent="Player1Card/MarginContainer"]
+[node name="Label" type="Label" parent="Player1Card/MarginContainer" unique_id=2022810502]
+layout_mode = 2
 theme_override_font_sizes/font_size = 20
+text = "Press F to join!"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "Press F to join!"
 
-[node name="Player2Card" type="PanelContainer" parent="."]
+[node name="Player2Card" type="PanelContainer" parent="." unique_id=1463979765]
+layout_mode = 0
 anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
@@ -53,20 +72,23 @@ offset_bottom = -40.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="Player2Card"]
+[node name="MarginContainer" type="MarginContainer" parent="Player2Card" unique_id=276826375]
+layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="Label" type="Label" parent="Player2Card/MarginContainer"]
+[node name="Label" type="Label" parent="Player2Card/MarginContainer" unique_id=893256076]
+layout_mode = 2
 theme_override_font_sizes/font_size = 20
+text = "Press / to join!"
 horizontal_alignment = 1
 vertical_alignment = 1
-text = "Press / to join!"
 
-[node name="StartButton" type="Button" parent="."]
+[node name="StartButton" type="Button" parent="." unique_id=774672529]
 visible = false
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
