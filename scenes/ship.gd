@@ -11,8 +11,6 @@ signal cowboy_ejected(cowboy: Cowboy)
 @export var eject_force: float = 120.0
 @export var eject_distance: float = 40.0
 
-@onready var collision: CollisionPolygon2D = $CollisionPolygon2D
-
 var is_piloted: bool = false
 var color: Color = HULL_COLOR
 var input_prefix: String = ""
@@ -25,7 +23,6 @@ func _ready() -> void:
 	add_to_group("ships")
 	if health <= 0:
 		health = ship_config.max_health
-	collision.polygon = ship_config.collision_polygon
 	modulate = HULL_COLOR
 	_set_visual(ship_config.visual_scene)
 

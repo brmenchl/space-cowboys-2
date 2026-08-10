@@ -7,5 +7,4 @@ class_name ShipConfig
 @export var bounce: float = 0.2
 @export var bullet_config: BulletConfig
 @export var visual_scene: PackedScene
-@export var collision_polygon: PackedVector2Array
 @export var spawn_weight: float = 1.0

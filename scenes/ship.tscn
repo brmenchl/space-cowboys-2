@@ -7,9 +7,6 @@
 process_mode = 1
 script = ExtResource("1")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1322290124]
-polygon = PackedVector2Array(24, 0, -16, 10, -16, -10)
-
 [node name="Wrap2D" type="Node" parent="." unique_id=1150689459 node_paths=PackedStringArray("target")]
 script = ExtResource("2")
 target = NodePath("..")

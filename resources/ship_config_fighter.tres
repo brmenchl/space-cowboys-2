@@ -1,15 +1,13 @@
-[gd_resource type="Resource" script_class="ShipConfig" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="ShipConfig" format=3 uid="uid://bkuudmc8q7ovg"]
 
-[ext_resource type="Script" path="res://resources/ship_config.gd" id="1"]
-[ext_resource type="Resource" path="res://resources/ship_movement_config_fighter.tres" id="2"]
-[ext_resource type="Resource" path="res://resources/bullet_config_fighter.tres" id="3"]
+[ext_resource type="Script" uid="uid://dqq6t752riv68" path="res://resources/ship_config.gd" id="1"]
+[ext_resource type="Resource" uid="uid://dbs7j0mrbw8yo" path="res://resources/ship_movement_config_fighter.tres" id="2"]
+[ext_resource type="Resource" uid="uid://covmrhro7kyqy" path="res://resources/bullet_config_fighter.tres" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/visuals/ship_visual_fighter.tscn" id="4"]
 
 [resource]
 script = ExtResource("1")
 movement_config = ExtResource("2")
-max_health = 100
 bullet_config = ExtResource("3")
 visual_scene = ExtResource("4")
-collision_polygon = PackedVector2Array(24, 0, -16, 10, -16, -10)
 spawn_weight = 2.0

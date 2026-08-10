@@ -16,14 +16,32 @@ var screen_size: Vector2
 var _shadow_dirs: Array[Vector2i] = []
 var _shadows: Array[Node2D] = []
 
+# Extra collision shapes added directly to the target's own RigidBody2D so a
+# hit on the wrapped-around "ghost" side is a contact on the one real body
+# (and so applies force/torque to it), instead of on a separate duplicate
+# body that would have to somehow forward the impulse back.
+var _ghost_shapes: Array[Dictionary] = []
+
+# Keeps a strong reference to any Shape2D resources built for ghost shapes
+# (e.g. from a CollisionPolygon2D). PhysicsServer2D RIDs don't keep their
+# resource alive, so without this the shape gets freed and its RID goes
+# dead as soon as it falls out of scope.
+var _owned_shapes: Array[Shape2D] = []
+
 
 func _ready() -> void:
 	if target == null:
 		target = get_parent()
 	_update_screen_size()
-	get_viewport().size_changed.connect(_update_screen_size)
+	# Scene preview/thumbnail generation runs @tool scripts without a live
+	# Viewport in the tree, so get_viewport() can be null there.
+	var viewport := get_viewport()
+	if viewport:
+		viewport.size_changed.connect(_update_screen_size)
 	if not Engine.is_editor_hint():
 		call_deferred("_create_shadows")
+		if target is RigidBody2D:
+			call_deferred("_create_ghost_shapes")
 		target.child_entered_tree.connect(_on_target_child_entered_tree)
 		target.child_exiting_tree.connect(_on_target_child_exiting_tree)
 
@@ -32,6 +50,7 @@ func _exit_tree() -> void:
 	for shadow in _shadows:
 		if is_instance_valid(shadow):
 			shadow.queue_free()
+	_remove_ghost_shapes()
 
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -47,6 +66,7 @@ func _physics_process(_delta: float) -> void:
 
 	if target is RigidBody2D:
 		_wrap_rigidbody(target)
+		_update_ghost_shapes()
 	else:
 		target.global_position = _calculate_wrap(target.global_position)
 
@@ -54,7 +74,9 @@ func _physics_process(_delta: float) -> void:
 
 
 func _update_screen_size() -> void:
-	screen_size = get_viewport().get_visible_rect().size
+	var viewport := get_viewport()
+	if viewport:
+		screen_size = viewport.get_visible_rect().size
 
 
 func _calculate_wrap(pos: Vector2) -> Vector2:
@@ -90,9 +112,11 @@ func _wrap_rigidbody(body: RigidBody2D) -> void:
 			state.transform = new_transform
 
 
-# Peeking "ghost" duplicates make the target visible and collidable on the
-# opposite edge while it straddles a screen boundary, rather than only
-# popping into view once it has fully crossed over.
+# Peeking "ghost" duplicates make the target visible on the opposite edge
+# while it straddles a screen boundary, rather than only popping into view
+# once it has fully crossed over. Collision for RigidBody2D targets is
+# handled separately by _create_ghost_shapes, so these duplicates are purely
+# visual for them and never need their own collision enabled.
 func _create_shadows() -> void:
 	_shadow_dirs = _get_wrap_directions()
 	for _dir in _shadow_dirs:
@@ -102,8 +126,82 @@ func _create_shadows() -> void:
 		_clear_groups(shadow)
 		shadow.visible = false
 		_set_shadow_collision_enabled(shadow, false)
+		if shadow is RigidBody2D:
+			shadow.freeze = true
+			shadow.freeze_mode = RigidBody2D.FREEZE_MODE_KINEMATIC
 		target.get_parent().add_child(shadow)
 		_shadows.append(shadow)
+
+
+# Adds one extra collision shape per (collision shape, wrap direction) pair
+# directly onto the target's own physics body, disabled until the target
+# nears that edge. Their local transforms are kept screen-aligned (see
+# _update_ghost_shapes) so the ghost shape doesn't spin around the body's
+# origin as the body rotates.
+func _create_ghost_shapes() -> void:
+	var body_rid: RID = target.get_rid()
+	for shape_def in _collect_shape_defs(target):
+		for dir in _shadow_dirs:
+			var shape_index := PhysicsServer2D.body_get_shape_count(body_rid)
+			PhysicsServer2D.body_add_shape(body_rid, shape_def.shape_rid, shape_def.local_transform, true)
+			_ghost_shapes.append({
+				"dir": dir,
+				"shape_index": shape_index,
+				"base_transform": shape_def.local_transform,
+			})
+
+
+func _remove_ghost_shapes() -> void:
+	if not target or not is_instance_valid(target) or not target is RigidBody2D:
+		return
+	var body_rid: RID = target.get_rid()
+	var indices: Array = []
+	for ghost in _ghost_shapes:
+		indices.append(ghost.shape_index)
+	indices.sort()
+	indices.reverse()
+	for shape_index in indices:
+		PhysicsServer2D.body_remove_shape(body_rid, shape_index)
+	_ghost_shapes.clear()
+	_owned_shapes.clear()
+
+
+# Collects the target's own collision shapes as reusable Shape2D RIDs. A
+# CollisionPolygon2D doesn't expose the Shape2D(s) it builds internally, so
+# equivalent ConvexPolygonShape2D(s) are created from its polygon. The
+# polygon may be concave, so it's decomposed into convex pieces the same way
+# CollisionPolygon2D's own BUILD_SOLIDS mode does, rather than handing the
+# raw points to ConvexPolygonShape2D (which would silently hull them).
+func _collect_shape_defs(node: Node) -> Array[Dictionary]:
+	var defs: Array[Dictionary] = []
+	for child in node.get_children():
+		if child is CollisionShape2D and child.shape:
+			defs.append({"shape_rid": child.shape.get_rid(), "local_transform": child.transform})
+		elif child is CollisionPolygon2D:
+			for convex_points in Geometry2D.decompose_polygon_in_convex(child.polygon):
+				var shape := ConvexPolygonShape2D.new()
+				shape.points = convex_points
+				_owned_shapes.append(shape)
+				defs.append({"shape_rid": shape.get_rid(), "local_transform": child.transform})
+		else:
+			defs.append_array(_collect_shape_defs(child))
+	return defs
+
+
+func _update_ghost_shapes() -> void:
+	var body_rid: RID = target.get_rid()
+	var rotation := target.global_rotation
+	for ghost in _ghost_shapes:
+		var dir: Vector2i = ghost.dir
+		var active := _is_direction_active(dir)
+		PhysicsServer2D.body_set_shape_disabled(body_rid, ghost.shape_index, not active)
+		if active:
+			var offset := Vector2(dir.x * screen_size.x, dir.y * screen_size.y)
+			var local_offset := offset.rotated(-rotation)
+			var base_transform: Transform2D = ghost.base_transform
+			var ghost_transform := base_transform
+			ghost_transform.origin = base_transform.origin + local_offset
+			PhysicsServer2D.body_set_shape_transform(body_rid, ghost.shape_index, ghost_transform)
 
 
 # The target's visual can be swapped at runtime after shadows are built
@@ -116,7 +214,7 @@ func _on_target_child_entered_tree(node: Node) -> void:
 		var copy := node.duplicate()
 		_clear_groups(copy)
 		_strip_wrap_children(copy)
-		_set_shadow_collision_enabled(copy, shadow.visible)
+		_set_shadow_collision_enabled(copy, false)
 		shadow.add_child(copy)
 
 
@@ -174,7 +272,8 @@ func _update_shadows() -> void:
 		var shadow: Node2D = _shadows[i]
 		var active := _is_direction_active(dir)
 		shadow.visible = active
-		_set_shadow_collision_enabled(shadow, active)
+		if not (target is RigidBody2D):
+			_set_shadow_collision_enabled(shadow, active)
 		if active:
 			var offset := Vector2(dir.x * screen_size.x, dir.y * screen_size.y)
 			shadow.global_position = target.global_position + offset

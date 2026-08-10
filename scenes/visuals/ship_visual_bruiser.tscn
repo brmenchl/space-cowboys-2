@@ -1,9 +1,16 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dpsk5r4ypoowu"]
 
-[ext_resource type="Texture2D" path="res://assets/ships/bruiser_ship.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://lts2yw31vtmc" path="res://assets/ships/bruiser_ship.png" id="1"]
 
-[node name="ShipVisualBruiser" type="Sprite2D"]
+[node name="ShipVisualBruiser" type="Node2D" unique_id=1035924932]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1199806997]
 texture_filter = 1
 rotation = -1.5708
 scale = Vector2(0.36, 0.36)
 texture = ExtResource("1")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=1131024602]
+rotation = -1.5708
+scale = Vector2(0.36, 0.36)
+polygon = PackedVector2Array(-56, -64, -56, -56, -64, -56, -64, 16, -56, 16, -56, 40, -48, 40, -48, 56, -40, 56, -40, 64, -32, 64, -32, 56, -24, 56, -24, 32, -16, 32, -16, 40, -8, 40, -8, 32, 8, 32, 8, 40, 16, 40, 16, 32, 24, 32, 24, 56, 32, 56, 32, 64, 40, 64, 40, 56, 48, 56, 48, 40, 56, 40, 56, 16, 64, 16, 64, -56, 56, -56, 56, -64, 40, -64, 40, -56, 32, -56, 32, -32, 24, -32, 24, -40, 16, -40, 16, -48, 8, -48, 8, -24, -8, -24, -8, -48, -16, -48, -16, -40, -24, -40, -24, -32, -32, -32, -32, -56, -40, -56, -40, -64)
