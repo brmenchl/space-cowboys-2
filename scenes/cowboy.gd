@@ -8,6 +8,8 @@ signal boarding_requested(ship: Ship)
 @export var color: Color = Color.WHITE
 @export var input_prefix: String = ""
 @export var cowboy_max_health: int = 15
+@export var cowboy_mass: float = 1.0
+@export var bounce: float = 0.2
 @export var visual_scene: PackedScene = preload("res://scenes/visuals/cowboy_visual.tscn")
 @export var bullet_config: BulletConfig = preload("res://resources/cowboy_bullet_config.tres")
 @export var movement_config: ShipMovementConfig = preload("res://resources/cowboy_movement_config.tres")
@@ -16,8 +18,6 @@ signal boarding_requested(ship: Ship)
 
 @onready var collision: CollisionPolygon2D = $CollisionPolygon2D
 @onready var lasso: Lasso = $Lasso
-
-var angular_velocity: float = 0.0
 
 var _shoot_cooldown: float = 0.0
 var _visual: AnimatedSprite2D
@@ -33,27 +33,32 @@ func _ready() -> void:
 	_visual.animation_finished.connect(_on_visual_animation_finished)
 	add_child(_visual)
 
+	mass = cowboy_mass
+	inertia = mass
+	gravity_scale = 0.0
+	linear_damp = movement_config.linear_friction
+	angular_damp = movement_config.angular_friction
+	var physics_material := PhysicsMaterial.new()
+	physics_material.bounce = bounce
+	physics_material_override = physics_material
+
 
 func _physics_process(delta: float) -> void:
-	_process_turning(delta)
-	_process_drift(delta)
-	move_and_slide()
+	_process_turning()
 	if lasso.is_pulling():
 		_process_lasso_swing()
 	_process_shooting(delta)
 	_process_lasso()
 
 
-func _process_turning(delta: float) -> void:
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	state.linear_velocity = state.linear_velocity.limit_length(movement_config.max_speed)
+	state.angular_velocity = clampf(state.angular_velocity, -movement_config.max_angular_speed, movement_config.max_angular_speed)
+
+
+func _process_turning() -> void:
 	var turn_input := Input.get_action_strength(input_prefix + "_move_right") - Input.get_action_strength(input_prefix + "_move_left")
-	angular_velocity += turn_input * movement_config.angular_acceleration * delta
-	angular_velocity -= angular_velocity * movement_config.angular_friction * delta
-	angular_velocity = clampf(angular_velocity, -movement_config.max_angular_speed, movement_config.max_angular_speed)
-	rotation += angular_velocity * delta
-
-
-func _process_drift(delta: float) -> void:
-	velocity -= velocity * movement_config.linear_friction * delta
+	apply_torque(turn_input * movement_config.angular_acceleration)
 
 
 # Keeps the cowboy on a taut, shrinking rope: any velocity component pulling
@@ -68,7 +73,7 @@ func _process_lasso_swing() -> void:
 	if distance > rope_length and distance > 0.0:
 		var radial := offset / distance
 		global_position = lasso.attach_point + radial * rope_length
-		velocity -= radial * velocity.dot(radial)
+		linear_velocity -= radial * linear_velocity.dot(radial)
 		distance = rope_length
 
 	if distance <= lasso_config.arrival_distance:
@@ -105,7 +110,7 @@ func _shoot() -> void:
 	bullet.rotation = facing.angle() + PI / 2.0
 	bullet.velocity = facing * bullet_config.speed
 	bullet.shooter = self
-	velocity -= facing * recoil_force
+	apply_central_impulse(-facing * recoil_force)
 
 
 func _die() -> void:

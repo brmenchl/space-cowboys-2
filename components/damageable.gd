@@ -1,4 +1,4 @@
-extends CharacterBody2D
+extends RigidBody2D
 class_name Damageable
 
 signal health_changed(new_health: int)

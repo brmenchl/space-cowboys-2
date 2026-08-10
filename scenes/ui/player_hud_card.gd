@@ -7,7 +7,6 @@ class_name PlayerHudCard
 @onready var _cowboy_health_bar: ProgressBar = $Margin/VBox/CowboyHealthBar
 
 var _controller: PlayerController
-var _active_body: Node2D
 var _portrait_visual: Node2D
 
 
@@ -31,16 +30,12 @@ func setup(controller: PlayerController, title: String) -> void:
 	_on_boarded(controller.current_ship)
 
 
-func _process(_delta: float) -> void:
-	if is_instance_valid(_active_body) and is_instance_valid(_portrait_visual):
-		_portrait_visual.rotation = _active_body.rotation
-
-
 func _set_visual(visual_scene: PackedScene) -> void:
 	if _portrait_visual:
 		_portrait_visual.queue_free()
 	_portrait_visual = visual_scene.instantiate()
 	_portrait_visual.modulate = _controller.color
+	_portrait_visual.rotation = 0.0
 	_portrait_container.add_child(_portrait_visual)
 	_center_portrait()
 
@@ -59,13 +54,11 @@ func _on_cowboy_health_changed(new_health: int) -> void:
 
 
 func _on_ejected(cowboy: Cowboy) -> void:
-	_active_body = cowboy
 	_ship_health_bar.visible = false
 	_set_visual(cowboy.visual_scene)
 
 
 func _on_boarded(ship: Ship) -> void:
-	_active_body = ship
 	_ship_health_bar.max_value = ship.ship_config.max_health
 	_ship_health_bar.visible = true
 	_set_visual(ship.ship_config.visual_scene)

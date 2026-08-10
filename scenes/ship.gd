@@ -16,7 +16,6 @@ signal cowboy_ejected(cowboy: Cowboy)
 var is_piloted: bool = false
 var color: Color = HULL_COLOR
 var input_prefix: String = ""
-var angular_velocity: float = 0.0
 
 var _visual: Node2D
 var _shoot_cooldown: float = 0.0
@@ -30,36 +29,44 @@ func _ready() -> void:
 	modulate = HULL_COLOR
 	_set_visual(ship_config.visual_scene)
 
+	mass = ship_config.mass
+	inertia = mass
+	gravity_scale = 0.0
+	linear_damp = ship_config.movement_config.linear_friction
+	angular_damp = ship_config.movement_config.angular_friction
+	var physics_material := PhysicsMaterial.new()
+	physics_material.bounce = ship_config.bounce
+	physics_material_override = physics_material
 
-func _physics_process(delta: float) -> void:
-	_process_turning(delta)
-	_process_thrust(delta)
-	move_and_slide()
+
+func _physics_process(_delta: float) -> void:
+	_process_turning()
+	_process_thrust()
 	if is_piloted:
-		_process_shooting(delta)
+		_process_shooting(_delta)
 		_process_ejecting()
 
 
-func _process_turning(delta: float) -> void:
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	state.linear_velocity = state.linear_velocity.limit_length(ship_config.movement_config.max_speed)
+	state.angular_velocity = clampf(state.angular_velocity, -ship_config.movement_config.max_angular_speed, ship_config.movement_config.max_angular_speed)
+
+
+func _process_turning() -> void:
 	var turn_input := 0.0
 	if is_piloted:
 		turn_input = Input.get_action_strength(input_prefix + "_move_right") - Input.get_action_strength(input_prefix + "_move_left")
-	angular_velocity += turn_input * ship_config.movement_config.angular_acceleration * delta
-	angular_velocity -= angular_velocity * ship_config.movement_config.angular_friction * delta
-	angular_velocity = clampf(angular_velocity, -ship_config.movement_config.max_angular_speed, ship_config.movement_config.max_angular_speed)
-	rotation += angular_velocity * delta
+	apply_torque(turn_input * ship_config.movement_config.angular_acceleration)
 
 
-func _process_thrust(delta: float) -> void:
-	if is_piloted:
-		var thrust_input := Input.get_action_strength(input_prefix + "_move_up")
-		var brake_input := Input.get_action_strength(input_prefix + "_move_down")
-		var facing := Vector2.RIGHT.rotated(rotation)
-		velocity += facing * thrust_input * ship_config.movement_config.acceleration * delta
-		velocity -= facing * brake_input * ship_config.movement_config.deceleration * delta
-
-	velocity -= velocity * ship_config.movement_config.linear_friction * delta
-	velocity = velocity.limit_length(ship_config.movement_config.max_speed)
+func _process_thrust() -> void:
+	if not is_piloted:
+		return
+	var thrust_input := Input.get_action_strength(input_prefix + "_move_up")
+	var brake_input := Input.get_action_strength(input_prefix + "_move_down")
+	var facing := Vector2.RIGHT.rotated(rotation)
+	apply_central_force(facing * thrust_input * ship_config.movement_config.acceleration)
+	apply_central_force(-facing * brake_input * ship_config.movement_config.deceleration)
 
 
 func _process_shooting(delta: float) -> void:
@@ -117,7 +124,7 @@ func _eject() -> void:
 	get_tree().current_scene.add_child(cowboy)
 	cowboy.global_position = global_position + eject_direction * eject_distance
 	cowboy.rotation = rotation
-	cowboy.velocity = eject_direction * eject_force
+	cowboy.linear_velocity = eject_direction * eject_force
 
 	is_piloted = false
 	input_prefix = ""

@@ -22,9 +22,14 @@ func _ready() -> void:
 	visual.scale = Vector2.ONE * radius / (visual.texture.get_size().x / 2.0)
 	add_child(visual)
 
+	mass = radius * radius * config.mass_per_radius_squared
+	inertia = mass
+	gravity_scale = 0.0
+	lock_rotation = false
+	angular_damp = config.angular_damp
+	var physics_material := PhysicsMaterial.new()
+	physics_material.bounce = config.bounce
+	physics_material_override = physics_material
+
 	var direction := Vector2.RIGHT.rotated(randf_range(0.0, TAU))
-	velocity = direction * randf_range(0.0, config.max_speed)
-
-
-func _physics_process(delta: float) -> void:
-	position += velocity * delta
+	linear_velocity = direction * randf_range(0.0, config.max_speed)
